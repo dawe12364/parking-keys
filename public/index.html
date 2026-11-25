@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Получение ключей от парковки</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --border: #e5e7eb;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding-top: 12px;
+    }
+
+    /* Верхний прогресс-бар */
+    .stepper {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .step-bar {
+      flex: 1;
+      height: 5px;
+      border-radius: 99px;
+      background: #d1d5db;
+      transition: background 0.3s ease;
+    }
+
+    .step-bar.active {
+      background: var(--primary);
+    }
+
+    .step-bar.done {
+      background: var(--success);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+
+    p.subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      font-size: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      border-color: var(--primary);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 16px 0 20px;
+      font-size: 13px;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--primary);
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 52px;
+      border: none;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .btn:active {
+      background: var(--primary-dark);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: var(--primary);
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Уведомления */
+    .alert {
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .alert-danger {
+      background: var(--danger-bg);
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-warning {
+      background: var(--warning-bg);
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    /* Камера и проверка лица */
+    .camera-stage-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .stage-pill {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 8px;
+      background: #f3f4f6;
+      color: var(--muted);
+    }
+
+    .stage-pill.active {
+      background: #dbeafe;
+      color: var(--primary-dark);
+    }
+
+    .stage-pill.done {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    video#cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block;
+    }
+
+    .overlay-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #ovalShape {
+      transition: stroke 0.25s ease, stroke-width 0.25s ease;
+    }
+
+    /* Анимированная стрелка направления */
+    .direction-arrow {
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.92);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s ease;
+      z-index: 5;
+    }
+
+    .arrow-right {
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: pulseRight 1s infinite;
+    }
+
+    .arrow-left {
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: pulseLeft 1s infinite;
+    }
+
+    .arrow-down {
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: pulseDown 1s infinite;
+    }
+
+    .arrow-up {
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: pulseUp 1s infinite;
+    }
+
+    @keyframes pulseRight {
+      0%, 100% { transform: translate(0, -50%); }
+      50% { transform: translate(7px, -50%); }
+    }
+    @keyframes pulseLeft {
+      0%, 100% { transform: translate(0, -50%); }
+      50% { transform: translate(-7px, -50%); }
+    }
+    @keyframes pulseDown {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, 7px); }
+    }
+    @keyframes pulseUp {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -7px); }
+    }
+
+    /* Плашка ACCESS */
+    .access-banner {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 163, 74, 0.85);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 10;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .access-badge {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      border: 3px solid #fff;
+      padding: 6px 20px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .face-prompt-box {
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .face-prompt-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .face-prompt-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hold-progress {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .hold-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--success);
+      transition: width 0.08s linear;
+    }
+
+    /* Debug панель */
+    .debug-panel {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.72);
+      color: #4ade80;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      z-index: 15;
+      pointer-events: none;
+      line-height: 1.35;
+    }
+
+    /* Блоки фото договора */
+    .doc-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 14px;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .doc-box.uploaded {
+      border-style: solid;
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .doc-box-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .doc-box-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .doc-preview {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-top: 8px;
+      display: block;
+    }
+
+    .info-list {
+      padding-left: 18px;
+      margin: 10px 0 18px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .info-list li {
+      margin-bottom: 6px;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--success-bg);
+      color: var(--success);
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="stepper">
+      <div class="step-bar active" id="bar1"></div>
+      <div class="step-bar" id="bar2"></div>
+      <div class="step-bar" id="bar3"></div>
+      <div class="step-bar" id="bar4"></div>
+    </div>
+
+    <!-- ЭКРАН БЛОКИРОВКИ: Встроенный браузер или HTTP -->
+    <div class="card hidden" id="screenEnvBlock">
+      <h1 id="envBlockTitle">Откройте сайт в Safari</h1>
+      <p class="subtitle" id="envBlockText">
+        Вы открыли ссылку во встроенном браузере приложения (Telegram, Instagram или WhatsApp). В нём камера на iPhone работает нестабильно.
+      </p>
+      <div class="alert alert-warning">
+        <strong>Как открыть правильно:</strong><br />
+        Нажмите на значок <strong>•••</strong> или <strong>Поделиться (квадрат со стрелкой)</strong> в углу экрана и выберите <strong>«Открыть в Safari»</strong> (или Chrome).
+      </div>
+      <button type="button" class="btn" id="copyLinkBtn">Скопировать ссылку</button>
+    </div>
+
+    <!-- ШАГ 1: Анкета жильца -->
+    <div class="card" id="screenStep1">
+      <h1>Ключи от парковки</h1>
+      <p class="subtitle">Заполните данные для оформления доступа. Они должны совпадать с договором аренды.</p>
+
+      <form id="infoForm">
+        <div class="field">
+          <label class="field-label" for="fullName">ФИО полностью (как в договоре)</label>
+          <input type="text" id="fullName" placeholder="Иванов Иван Иванович" required />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="email">Email (сюда придёт подтверждение)</label>
+          <input type="email" id="email" placeholder="name@example.com" required />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="apartment">Номер квартиры</label>
+          <input type="text" id="apartment" placeholder="Например: 142" required />
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="consentCheck" required />
+          <span>Я даю согласие на обработку фото лица, видеозаписи проверки и фотографий договора аренды для выдачи ключей от парковки.</span>
+        </label>
+
+        <button type="submit" class="btn">Продолжить</button>
+      </form>
+    </div>
+
+    <!-- ШАГ 2А: Предупреждение перед включением камеры -->
+    <div class="card hidden" id="screenCameraIntro">
+      <h1>Проверка личности</h1>
+      <p class="subtitle">Сейчас мы включим фронтальную камеру вашего телефона.</p>
+
+      <ul class="info-list">
+        <li>Встаньте так, чтобы лицо было хорошо освещено спереди.</li>
+        <li>Снимите головной убор, маску или тёмные очки.</li>
+        <li>Держите телефон на уровне глаз и следуйте подсказкам на экране.</li>
+        <li>Проверка происходит прямо в вашем браузере.</li>
+      </ul>
+
+      <div id="cameraErrorBox" class="alert alert-danger hidden"></div>
+
+      <button type="button" class="btn" id="startCameraBtn">Включить камеру</button>
+    </div>
+
+    <!-- ШАГ 2Б: Живая проверка лица -->
+    <div class="card hidden" id="screenFaceCheck">
+      <div class="camera-stage-pills">
+        <div class="stage-pill active" id="pillCalib">1. Прямо</div>
+        <div class="stage-pill" id="pillCircle">2. По кругу</div>
+        <div class="stage-pill" id="pillLR">3. Влево/Вправо</div>
+      </div>
+
+      <div class="video-wrapper">
+        <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
+
+        <!-- Овальная рамка -->
+        <svg class="overlay-svg" viewBox="0 0 300 400" preserveAspectRatio="none">
+          <defs>
+            <mask id="ovalMask">
+              <rect width="300" height="400" fill="white" />
+              <ellipse cx="150" cy="195" rx="92" ry="128" fill="black" />
+            </mask>
+          </defs>
+          <rect width="300" height="400" fill="rgba(17, 24, 39, 0.52)" mask="url(#ovalMask)" />
+          <ellipse id="ovalShape" cx="150" cy="195" rx="92" ry="128" fill="none" stroke="#ffffff" stroke-width="4" />
+        </svg>
+
+        <!-- Анимированная стрелка -->
+        <div id="directionArrow" class="direction-arrow hidden">→</div>
+
+        <!-- Плашка ACCESS между этапами -->
+        <div id="accessBanner" class="access-banner hidden">
+          <div class="access-badge">ACCESS</div>
+          <div id="accessBannerText" style="font-size: 16px; font-weight: 600;">Этап пройден!</div>
+        </div>
+
+        <!-- Debug панель (?debug=1) -->
+        <div id="debugPanel" class="debug-panel hidden"></div>
+      </div>
+
+      <div class="face-prompt-box">
+        <div class="face-prompt-title" id="facePromptTitle">Загрузка нейросети...</div>
+        <div class="face-prompt-sub" id="facePromptSub">Пожалуйста, подождите пару секунд</div>
+        <div class="hold-progress">
+          <div class="hold-progress-fill" id="holdProgressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ШАГ 3: Фотографии договора аренды -->
+    <div class="card hidden" id="screenContract">
+      <h1>Фото договора аренды</h1>
+      <p class="subtitle">Сфотографируйте две страницы договора при хорошем освещении, чтобы текст легко читался.</p>
+
+      <!-- Первая страница -->
+      <div class="doc-box" id="docBox1" onclick="document.getElementById('docInput1').click()">
+        <div class="doc-box-title">1. Первая страница договора</div>
+        <div class="doc-box-desc" id="docDesc1">Нажмите, чтобы открыть камеру и сфотографировать</div>
+        <img id="docPreview1" class="doc-preview hidden" alt="Первая страница" />
+        <input type="file" id="docInput1" accept="image/*" capture="environment" class="hidden" />
+      </div>
+
+      <!-- Последняя страница -->
+      <div class="doc-box" id="docBox2" onclick="document.getElementById('docInput2').click()">
+        <div class="doc-box-title">2. Последняя страница с подписями</div>
+        <div class="doc-box-desc" id="docDesc2">Нажмите, чтобы открыть камеру и сфотографировать</div>
+        <img id="docPreview2" class="doc-preview hidden" alt="Последняя страница" />
+        <input type="file" id="docInput2" accept="image/*" capture="environment" class="hidden" />
+      </div>
+
+      <div id="submitErrorBox" class="alert alert-danger hidden"></div>
+
+      <button type="button" class="btn" id="submitAllBtn" disabled>Отправить заявку</button>
+    </div>
+
+    <!-- ШАГ 4: Заявка отправлена -->
+    <div class="card hidden" id="screenDone" style="text-align: center;">
+      <div class="success-icon">✓</div>
+      <h1>Заявка отправлена!</h1>
+      <p class="subtitle" style="margin-bottom: 14px;">
+        Спасибо! Мы получили ваши данные, видео проверки и фотографии договора.
+      </p>
+      <div class="alert alert-warning" style="text-align: left;">
+        После проверки документов на вашу почту <strong id="doneEmail"></strong> придёт письмо с подтверждением и инструкцией по получению ключей от парковки.
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { FaceLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+    import { upload } from 'https://esm.sh/@vercel/blob@0.27.0/client';
+
+    const isDebug = new URLSearchParams(window.location.search).get('debug') === '1';
+
+    // Состояние приложения
+    const state = {
+      fullName: '',
+      email: '',
+      apartment: '',
+      selfieBase64: null,
+      contractPage1Base64: null,
+      contractLastPageBase64: null,
+      videoBlob: null,
+      videoExt: 'mp4',
+      metrics: {
+        minYaw: 0,
+        maxYaw: 0,
+        minPitch: 0,
+        maxPitch: 0,
+      },
+    };
+
+    // 1. Проверка окружения (HTTPS и встроенные браузеры)
+    function checkEnvironment() {
+      const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (location.protocol !== 'https:' && !isLocal) {
+        document.getElementById('screenStep1').classList.add('hidden');
+        document.getElementById('screenEnvBlock').classList.remove('hidden');
+        document.getElementById('envBlockTitle').textContent = 'Требуется защищённое соединение (HTTPS)';
+        document.getElementById('envBlockText').textContent = 'Камера работает только по протоколу HTTPS. Откройте сайт по https:// ссылке.';
+        return false;
+      }
+
+      const ua = navigator.userAgent || '';
+      const isInApp = /Telegram|Instagram|FBAN|FBAV|WhatsApp|TikTok|BytedanceWebview|VKClient/i.test(ua);
+      if (isInApp) {
+        document.getElementById('screenStep1').classList.add('hidden');
+        document.getElementById('screenEnvBlock').classList.remove('hidden');
+        return false;
+      }
+      return true;
+    }
+
+    document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        document.getElementById('copyLinkBtn').textContent = 'Ссылка скопирована! Вставьте в Safari';
+      } catch {
+        alert('Скопируйте адрес из верхней строки браузера.');
+      }
+    });
+
+    checkEnvironment();
+
+    // Навигация между экранами
+    function showScreen(screenId, stepNum) {
+      ['screenStep1', 'screenCameraIntro', 'screenFaceCheck', 'screenContract', 'screenDone'].forEach((id) => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+
+      for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById(`bar${i}`);
+        bar.classList.remove('active', 'done');
+        if (i < stepNum) bar.classList.add('done');
+        if (i === stepNum) bar.classList.add('active');
+      }
+    }
+
+    // Предзагрузка модели MediaPipe
+    let faceLandmarker = null;
+    let modelLoadingPromise = null;
+
+    async function ensureFaceLandmarker() {
+      if (faceLandmarker) return faceLandmarker;
+      if (!modelLoadingPromise) {
+        modelLoadingPromise = (async () => {
+          const vision = await FilesetResolver.forVisionTasks(
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+          );
+          faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+            baseOptions: {
+              modelAssetPath:
+                'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+              delegate: 'GPU',
+            },
+            runningMode: 'VIDEO',
+            numFaces: 2,
+          });
+          return faceLandmarker;
+        })();
+      }
+      return modelLoadingPromise;
+    }
+
+    // Шаг 1: Отправка формы анкеты
+    document.getElementById('infoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.fullName = document.getElementById('fullName').value.trim();
+      state.email = document.getElementById('email').value.trim();
+      state.apartment = document.getElementById('apartment').value.trim();
+
+      ensureFaceLandmarker().catch(console.error);
+      showScreen('screenCameraIntro', 2);
+    });
+
+    // Шаг 2: Работа с камерой, MediaRecorder и проверка лица
+    let mediaStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let detectionLoopActive = false;
+
+    const REQUIRED_HOLD_FRAMES = 12;
+    const YAW_THRESHOLD = 13;   // градусов для вправо/влево
+    const PITCH_THRESHOLD = 9;  // градусов для вверх/вниз
+
+    // Последовательность шагов проверки лица
+    const LIVENESS_STEPS = [
+      { id: 'calib', stage: 1, title: 'Смотрите прямо в камеру', sub: 'Держите лицо ровно внутри овала', arrow: null },
+      { id: 'c_right', stage: 2, title: 'Круг: поверните голову ВПРАВО', sub: 'Шаг 1 из 4 по кругу', arrow: 'right', symbol: '→' },
+      { id: 'c_down', stage: 2, title: 'Круг: наклоните голову ВНИЗ', sub: 'Шаг 2 из 4 по кругу', arrow: 'down', symbol: '↓' },
+      { id: 'c_left', stage: 2, title: 'Круг: поверните голову ВЛЕВО', sub: 'Шаг 3 из 4 по кругу', arrow: 'left', symbol: '←' },
+      { id: 'c_up', stage: 2, title: 'Круг: поднимите голову ВВЕРХ', sub: 'Шаг 4 из 4 по кругу', arrow: 'up', symbol: '↑' },
+      { id: 'lr_right', stage: 3, title: 'Поверните голову ВПРАВО', sub: 'Финальная проверка: 1 из 2', arrow: 'right', symbol: '→' },
+      { id: 'lr_left', stage: 3, title: 'Поверните голову ВЛЕВО', sub: 'Финальная проверка: 2 из 2', arrow: 'left', symbol: '←' },
+    ];
+
+    function showCameraError(err) {
+      const box = document.getElementById('cameraErrorBox');
+      box.classList.remove('hidden');
+
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        box.innerHTML = `
+          <strong>Доступ к камере запрещён.</strong><br/>
+          Чтобы разрешить камеру на iPhone:<br/>
+          1. Нажмите <strong>«АА»</strong> или значок настроек слева/справа в адресной строке Safari.<br/>
+          2. Выберите <strong>«Настройки веб-сайта» → «Камера» → «Разрешить»</strong>.<br/>
+          3. Нажмите кнопку «Включить камеру» ниже ещё раз.
+        `;
+      } else if (err.name === 'NotFoundError') {
+        box.innerHTML = '<strong>Камера не найдена.</strong> Проверьте, что на устройстве есть фронтальная камера.';
+      } else if (err.name === 'NotReadableError') {
+        box.innerHTML = '<strong>Камера занята другим приложением.</strong> Закройте звонки или другие вкладки с камерой и попробуйте снова.';
+      } else {
+        box.innerHTML = `<strong>Не удалось включить камеру:</strong> ${err.message}`;
+      }
+    }
+
+    function captureHighResSelfie(videoEl) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoEl.videoWidth || 1080;
+      canvas.height = videoEl.videoHeight || 1920;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      state.selfieBase64 = canvas.toDataURL('image/jpeg', 0.92);
+    }
+
+    function startVideoRecording(stream) {
+      recordedChunks = [];
+      const mimeCandidates = [
+        'video/mp4;codecs=avc1',
+        'video/mp4',
+        'video/webm;codecs=vp9',
+        'video/webm',
+      ];
+
+      let chosenMime = '';
+      for (const mime of mimeCandidates) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(mime)) {
+          chosenMime = mime;
+          break;
+        }
+      }
+
+      state.videoExt = chosenMime.includes('webm') ? 'webm' : 'mp4';
+
+      const options = { videoBitsPerSecond: 5_000_000 };
+      if (chosenMime) options.mimeType = chosenMime;
+
+      try {
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch {
+        mediaRecorder = new MediaRecorder(stream);
+      }
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.start(1000);
+    }
+
+    function stopVideoRecordingAndCamera() {
+      return new Promise((resolve) => {
+        detectionLoopActive = false;
+
+        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+          if (mediaStream) mediaStream.getTracks().forEach((t) => t.stop());
+          resolve();
+          return;
+        }
+
+        mediaRecorder.onstop = () => {
+          state.videoBlob = new Blob(recordedChunks, {
+            type: mediaRecorder.mimeType || 'video/mp4',
+          });
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((t) => t.stop());
+          }
+          resolve();
+        };
+
+        mediaRecorder.stop();
+      });
+    }
+
+    document.getElementById('startCameraBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('startCameraBtn');
+      btn.disabled = true;
+      btn.textContent = 'Подключаем камеру...';
+      document.getElementById('cameraErrorBox').classList.add('hidden');
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: 'user',
+            width: { ideal: 1080 },
+            height: { ideal: 1920 },
+            frameRate: { ideal: 30 },
+          },
+        });
+
+        const videoEl = document.getElementById('cameraVideo');
+        videoEl.srcObject = mediaStream;
+        await videoEl.play();
+
+        showScreen('screenFaceCheck', 2);
+        await ensureFaceLandmarker();
+
+        startVideoRecording(mediaStream);
+        runFaceDetectionLoop(videoEl);
+      } catch (err) {
+        console.error(err);
+        showCameraError(err);
+        btn.disabled = false;
+        btn.textContent = 'Включить камеру';
+      }
+    });
+
+    function runFaceDetectionLoop(videoEl) {
+      detectionLoopActive = true;
+      let currentStepIdx = 0;
+      let holdFrames = 0;
+      let pausedForAccess = false;
+
+      let calibYaw = 0;
+      let calibPitch = 0;
+      let calibSamples = [];
+
+      const ovalShape = document.getElementById('ovalShape');
+      const arrowEl = document.getElementById('directionArrow');
+      const promptTitle = document.getElementById('facePromptTitle');
+      const promptSub = document.getElementById('facePromptSub');
+      const holdFill = document.getElementById('holdProgressFill');
+      const debugPanel = document.getElementById('debugPanel');
+      const accessBanner = document.getElementById('accessBanner');
+      const accessBannerText = document.getElementById('accessBannerText');
+
+      if (isDebug) debugPanel.classList.remove('hidden');
+
+      function updateStepUI() {
+        const step = LIVENESS_STEPS[currentStepIdx];
+        if (!step) return;
+
+        promptTitle.textContent = step.title;
+        promptSub.textContent = step.sub;
+
+        // Обновляем пилюли этапов
+        document.getElementById('pillCalib').className =
+          'stage-pill ' + (step.stage === 1 ? 'active' : 'done');
+        document.getElementById('pillCircle').className =
+          'stage-pill ' + (step.stage === 2 ? 'active' : step.stage > 2 ? 'done' : '');
+        document.getElementById('pillLR').className =
+          'stage-pill ' + (step.stage === 3 ? 'active' : '');
+
+        // Обновляем анимированную стрелку
+        arrowEl.className = 'direction-arrow';
+        if (step.arrow) {
+          arrowEl.classList.add(`arrow-${step.arrow}`);
+          arrowEl.textContent = step.symbol;
+        } else {
+          arrowEl.classList.add('hidden');
+        }
+      }
+
+      updateStepUI();
+
+      function triggerAccessBanner(text, onAfter) {
+        pausedForAccess = true;
+        ovalShape.setAttribute('stroke', '#16a34a');
+        ovalShape.setAttribute('stroke-width', '6');
+        arrowEl.classList.add('hidden');
+        accessBannerText.textContent = text;
+        accessBanner.classList.remove('hidden');
+
+        setTimeout(() => {
+          accessBanner.classList.add('hidden');
+          ovalShape.setAttribute('stroke', '#ffffff');
+          ovalShape.setAttribute('stroke-width', '4');
+          pausedForAccess = false;
+          onAfter();
+        }, 1400);
+      }
+
+      let lastVideoTime = -1;
+
+      function tick() {
+        if (!detectionLoopActive) return;
+
+        if (pausedForAccess || videoEl.readyState < 2 || videoEl.currentTime === lastVideoTime) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        lastVideoTime = videoEl.currentTime;
+        const result = faceLandmarker.detectForVideo(videoEl, performance.now());
+        const faces = result.faceLandmarks || [];
+        const step = LIVENESS_STEPS[currentStepIdx];
+
+        // Проверка 1: ровно одно лицо в кадре
+        if (faces.length === 0) {
+          holdFrames = 0;
+          holdFill.style.width = '0%';
+          ovalShape.setAttribute('stroke', '#f59e0b');
+          promptTitle.textContent = 'Лицо не найдено';
+          promptSub.textContent = 'Поместите лицо в центр овала';
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        if (faces.length > 1) {
+          holdFrames = 0;
+          holdFill.style.width = '0%';
+          ovalShape.setAttribute('stroke', '#dc2626');
+          promptTitle.textContent = 'В кадре несколько человек';
+          promptSub.textContent = 'В кадре должен быть только заявитель';
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        const lm = faces[0];
+        // Ключевые точки MediaPipe: 1 (нос), 234 (правый край лица), 454 (левый край), 10 (верх лба), 152 (подбородок)
+        const nose = lm[1];
+        const rightEdge = lm[234];
+        const leftEdge = lm[454];
+        const forehead = lm[10];
+        const chin = lm[152];
+
+        const faceWidth = Math.abs(leftEdge.x - rightEdge.x);
+        const faceHeight = Math.abs(chin.y - forehead.y);
+
+        // Проверка 2: лицо достаточно крупное
+        if (faceWidth < 0.26 || faceHeight < 0.24) {
+          holdFrames = 0;
+          holdFill.style.width = '0%';
+          ovalShape.setAttribute('stroke', '#f59e0b');
+          promptTitle.textContent = 'Поднесите телефон ближе';
+          promptSub.textContent = 'Лицо должно занимать большую часть овала';
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        // Расчёт углов поворота (yaw) и наклона (pitch)
+        const midX = (rightEdge.x + leftEdge.x) / 2;
+        const midY = (forehead.y + chin.y) / 2;
+
+        const rawYaw = (nose.x - midX) / faceWidth;
+        const rawPitch = (nose.y - midY) / faceHeight;
+
+        const yaw = -(rawYaw - calibYaw) * 90;
+        const pitch = -(rawPitch - calibPitch) * 90;
+
+        // Сохраняем максимальные отклонения после калибровки
+        if (currentStepIdx > 0) {
+          state.metrics.minYaw = Math.round(Math.min(state.metrics.minYaw, yaw));
+          state.metrics.maxYaw = Math.round(Math.max(state.metrics.maxYaw, yaw));
+          state.metrics.minPitch = Math.round(Math.min(state.metrics.minPitch, pitch));
+          state.metrics.maxPitch = Math.round(Math.max(state.metrics.maxPitch, pitch));
+        }
+
+        if (isDebug) {
+          debugPanel.innerHTML = [
+            `step: ${step.id} (${holdFrames}/${REQUIRED_HOLD_FRAMES})`,
+            `yaw: ${yaw.toFixed(1)}° | pitch: ${pitch.toFixed(1)}°`,
+            `size: ${(faceWidth * 100).toFixed(0)}% x ${(faceHeight * 100).toFixed(0)}%`,
+          ].join('<br/>');
+        }
+
+        // Проверка условия текущего шага
+        let matched = false;
+        if (step.id === 'calib') {
+          matched = Math.abs(rawYaw) < 0.08 && Math.abs(rawPitch) < 0.12;
+          if (matched) {
+            calibSamples.push({ rawYaw, rawPitch });
+          } else {
+            calibSamples = [];
+          }
+        } else if (step.id === 'c_right' || step.id === 'lr_right') {
+          matched = yaw >= YAW_THRESHOLD;
+        } else if (step.id === 'c_left' || step.id === 'lr_left') {
+          matched = yaw <= -YAW_THRESHOLD;
+        } else if (step.id === 'c_down') {
+          matched = pitch <= -PITCH_THRESHOLD;
+        } else if (step.id === 'c_up') {
+          matched = pitch >= PITCH_THRESHOLD;
+        }
+
+        if (matched) {
+          holdFrames++;
+          ovalShape.setAttribute('stroke', '#16a34a');
+          promptTitle.textContent = step.title;
+          promptSub.textContent = 'Отлично, удерживайте...';
+        } else {
+          holdFrames = Math.max(0, holdFrames - 1);
+          ovalShape.setAttribute('stroke', '#3b82f6');
+          promptTitle.textContent = step.title;
+          promptSub.textContent = step.sub;
+        }
+
+        holdFill.style.width = `${Math.min(100, (holdFrames / REQUIRED_HOLD_FRAMES) * 100)}%`;
+
+        // Шаг засчитан!
+        if (holdFrames >= REQUIRED_HOLD_FRAMES) {
+          holdFrames = 0;
+          holdFill.style.width = '0%';
+
+          if (step.id === 'calib') {
+            // Усредняем калибровку и делаем фото анфас в высоком качестве
+            const sum = calibSamples.reduce(
+              (acc, s) => ({ y: acc.y + s.rawYaw, p: acc.p + s.rawPitch }),
+              { y: 0, p: 0 }
+            );
+            calibYaw = sum.y / calibSamples.length;
+            calibPitch = sum.p / calibSamples.length;
+            captureHighResSelfie(videoEl);
+
+            currentStepIdx++;
+            updateStepUI();
+          } else if (step.id === 'c_up') {
+            // Завершено круговое движение -> зелёный ACCESS -> переход к вправо/влево
+            triggerAccessBanner('Круговое движение пройдено!', () => {
+              currentStepIdx++;
+              updateStepUI();
+            });
+          } else if (step.id === 'lr_left') {
+            // Завершена финальная проверка вправо/влево -> ACCESS -> переход к договору
+            triggerAccessBanner('Проверка личности пройдена!', async () => {
+              await stopVideoRecordingAndCamera();
+              showScreen('screenContract', 3);
+            });
+            return;
+          } else {
+            currentStepIdx++;
+            updateStepUI();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    // Шаг 3: Сжатие фото договора до ~1600 px
+    function compressImageFile(file, maxSide = 1600, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let { width, height } = img;
+          if (width > maxSide || height > maxSide) {
+            if (width >= height) {
+              height = Math.round((height * maxSide) / width);
+              width = maxSide;
+            } else {
+              width = Math.round((width * maxSide) / height);
+              height = maxSide;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('Не удалось прочитать фотографию'));
+        };
+        img.src = url;
+      });
+    }
+
+    function updateSubmitButtonState() {
+      const ready = Boolean(state.contractPage1Base64 && state.contractLastPageBase64);
+      document.getElementById('submitAllBtn').disabled = !ready;
+    }
+
+    document.getElementById('docInput1').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const compressed = await compressImageFile(file);
+      state.contractPage1Base64 = compressed;
+
+      document.getElementById('docBox1').classList.add('uploaded');
+      document.getElementById('docDesc1').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
+      const prev = document.getElementById('docPreview1');
+      prev.src = compressed;
+      prev.classList.remove('hidden');
+      updateSubmitButtonState();
+    });
+
+    document.getElementById('docInput2').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const compressed = await compressImageFile(file);
+      state.contractLastPageBase64 = compressed;
+
+      document.getElementById('docBox2').classList.add('uploaded');
+      document.getElementById('docDesc2').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
+      const prev = document.getElementById('docPreview2');
+      prev.src = compressed;
+      prev.classList.remove('hidden');
+      updateSubmitButtonState();
+    });
+
+    // Шаг 4: Загрузка видео в Vercel Blob и отправка заявки
+    document.getElementById('submitAllBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitAllBtn');
+      const errBox = document.getElementById('submitErrorBox');
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+
+      try {
+        let videoUrl = null;
+
+        if (state.videoBlob && state.videoBlob.size > 0) {
+          btn.textContent = 'Загружаем видео (0%)...';
+          const blob = await upload(`liveness-${Date.now()}.${state.videoExt}`, state.videoBlob, {
+            access: 'public',
+            handleUploadUrl: '/api/blob-token',
+            onUploadProgress: ({ percentage }) => {
+              btn.textContent = `Загружаем видео (${Math.round(percentage)}%)...`;
+            },
+          });
+          videoUrl = blob.url;
+        }
+
+        btn.textContent = 'Отправляем заявку...';
+
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: state.fullName,
+            email: state.email,
+            apartment: state.apartment,
+            metrics: state.metrics,
+            selfieBase64: state.selfieBase64,
+            contractPage1Base64: state.contractPage1Base64,
+            contractLastPageBase64: state.contractLastPageBase64,
+            videoUrl,
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || 'Ошибка при отправке заявки');
+        }
+
+        document.getElementById('doneEmail').textContent = state.email;
+        showScreen('screenDone', 4);
+      } catch (err) {
+        console.error(err);
+        errBox.textContent = `Ошибка отправки: ${err.message}`;
+        errBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Попробовать отправить снова';
+      }
+    });
+  </script>
+</body>
+</html>
