@@ -70,7 +70,7 @@
     .card.sumsub-mode {
       border: none;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-      padding: 24px 16px 28px;
+      padding: 22px 14px 28px;
       text-align: center;
     }
 
@@ -176,7 +176,7 @@
     .camera-stage-pills {
       display: flex;
       gap: 6px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .stage-pill {
@@ -196,8 +196,8 @@
     /* Круговой виджет в стиле Sumsub */
     .sumsub-circle-stage {
       position: relative;
-      width: 320px;
-      height: 320px;
+      width: 296px;
+      height: 296px;
       margin: 4px auto 18px;
       display: flex;
       align-items: center;
@@ -214,19 +214,19 @@
 
     .tick-line {
       stroke: #cbd5e1;
-      stroke-width: 3.2;
+      stroke-width: 3;
       stroke-linecap: round;
-      transition: stroke 0.15s ease, stroke-width 0.15s ease;
+      transition: stroke 0.14s ease, stroke-width 0.14s ease;
     }
 
     .tick-line.target {
       stroke: #60a5fa;
-      stroke-width: 3.8;
+      stroke-width: 3.6;
     }
 
     .tick-line.done {
       stroke: #16a34a;
-      stroke-width: 4;
+      stroke-width: 3.8;
     }
 
     .tick-line.error {
@@ -235,8 +235,8 @@
 
     .circle-video-mask {
       position: relative;
-      width: 248px;
-      height: 248px;
+      width: 228px;
+      height: 228px;
       border-radius: 50%;
       overflow: hidden;
       background: #111827;
@@ -254,25 +254,25 @@
 
     .direction-arrow {
       position: absolute;
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: rgba(37, 99, 235, 0.92);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
       z-index: 5;
       pointer-events: none;
     }
 
-    .arrow-up { top: 44px; left: 50%; transform: translateX(-50%); animation: pulseUp 1s infinite; }
-    .arrow-left { left: 44px; top: 50%; transform: translateY(-50%); animation: pulseLeft 1s infinite; }
-    .arrow-down { bottom: 44px; left: 50%; transform: translateX(-50%); animation: pulseDown 1s infinite; }
-    .arrow-right { right: 44px; top: 50%; transform: translateY(-50%); animation: pulseRight 1s infinite; }
+    .arrow-up { top: 40px; left: 50%; transform: translateX(-50%); animation: pulseUp 1s infinite; }
+    .arrow-left { left: 40px; top: 50%; transform: translateY(-50%); animation: pulseLeft 1s infinite; }
+    .arrow-down { bottom: 40px; left: 50%; transform: translateX(-50%); animation: pulseDown 1s infinite; }
+    .arrow-right { right: 40px; top: 50%; transform: translateY(-50%); animation: pulseRight 1s infinite; }
 
     @keyframes pulseUp { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -6px); } }
     @keyframes pulseLeft { 0%, 100% { transform: translate(0, -50%); } 50% { transform: translate(-6px, -50%); } }
@@ -283,7 +283,7 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: rgba(22, 163, 74, 0.9);
+      background: rgba(22, 163, 74, 0.92);
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -296,11 +296,11 @@
     }
 
     .access-badge {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: 2px;
       border: 2.5px solid #fff;
-      padding: 4px 16px;
+      padding: 4px 14px;
       border-radius: 10px;
       margin-bottom: 8px;
     }
@@ -454,8 +454,8 @@
       <p class="subtitle">Сейчас мы включим фронтальную камеру вашего телефона.</p>
 
       <ul class="info-list">
-        <li>Расположите лицо по центру круга при хорошем освещении.</li>
-        <li>Не закрывайте лицо руками, волосами, маской или очками.</li>
+        <li>Расположите лицо по центру круга при нормальном освещении.</li>
+        <li>Не закрывайте лицо руками, маской или тёмными очками.</li>
         <li>Плавно покрутите головой по кругу, закрашивая деления вокруг экрана.</li>
         <li>Проверка работает прямо в вашем браузере.</li>
       </ul>
@@ -474,7 +474,7 @@
       </div>
 
       <div class="sumsub-circle-stage">
-        <svg class="sumsub-ticks-svg" id="ticksSvg" viewBox="0 0 320 320"></svg>
+        <svg class="sumsub-ticks-svg" id="ticksSvg" viewBox="0 0 296 296"></svg>
 
         <div class="circle-video-mask">
           <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
@@ -560,10 +560,10 @@
       svg.innerHTML = '';
       tickElements.length = 0;
 
-      const cx = 160;
-      const cy = 160;
-      const rInner = 135;
-      const rOuter = 152;
+      const cx = 148;
+      const cy = 148;
+      const rInner = 124; // зазор после видео-круга (радиус 114px)
+      const rOuter = 140; // внешний радиус полосок
 
       for (let i = 0; i < TOTAL_TICKS; i++) {
         const angleDeg = -90 + (i * 360) / TOTAL_TICKS;
@@ -633,7 +633,6 @@
       }
     }
 
-    // Динамическая загрузка MediaPipe (не блокирует первый экран)
     let faceLandmarker = null;
     let modelLoadingPromise = null;
 
@@ -655,10 +654,9 @@
             },
             runningMode: 'VIDEO',
             numFaces: 2,
-            minFaceDetectionConfidence: 0.75,
-            minFacePresenceConfidence: 0.75,
-            minTrackingConfidence: 0.75,
-            outputFacialTransformationMatrixes: true,
+            minFaceDetectionConfidence: 0.72,
+            minFacePresenceConfidence: 0.72,
+            minTrackingConfidence: 0.72,
           });
           return faceLandmarker;
         })();
@@ -666,7 +664,6 @@
       return modelLoadingPromise;
     }
 
-    // Надёжный переход с Шага 1 без перезагрузки страницы
     const infoForm = document.getElementById('infoForm');
     function handleFormProceed(e) {
       if (e) e.preventDefault();
@@ -683,7 +680,6 @@
     infoForm.addEventListener('submit', handleFormProceed);
     document.getElementById('continueBtn').addEventListener('click', handleFormProceed);
 
-    // Камера и запись видео
     let mediaStream = null;
     let mediaRecorder = null;
     let recordedChunks = [];
@@ -814,158 +810,18 @@
       }
     });
 
-    // Детектор перекрытия лица рукой (Anti-Occlusion)
-    const analysisCanvas = document.createElement('canvas');
-    analysisCanvas.width = 160;
-    analysisCanvas.height = 213;
-    const analysisCtx = analysisCanvas.getContext('2d', { willReadFrequently: true });
-
-    function sampleRegionStats(imgData, cxNorm, cyNorm, radiusPx) {
-      const w = imgData.width;
-      const h = imgData.height;
-      const data = imgData.data;
-      const cx = Math.round(cxNorm * w);
-      const cy = Math.round(cyNorm * h);
-
-      let sumLum = 0;
-      let sumLumSq = 0;
-      let sumR = 0;
-      let sumG = 0;
-      let sumB = 0;
-      let count = 0;
-
-      const x0 = Math.max(0, cx - radiusPx);
-      const x1 = Math.min(w - 1, cx + radiusPx);
-      const y0 = Math.max(0, cy - radiusPx);
-      const y1 = Math.min(h - 1, cy + radiusPx);
-
-      for (let y = y0; y <= y1; y++) {
-        for (let x = x0; x <= x1; x++) {
-          const idx = (y * w + x) * 4;
-          const r = data[idx];
-          const g = data[idx + 1];
-          const b = data[idx + 2];
-          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          sumLum += lum;
-          sumLumSq += lum * lum;
-          sumR += r;
-          sumG += g;
-          sumB += b;
-          count++;
-        }
-      }
-
-      if (count === 0) return { meanLum: 128, stdLum: 20, r: 128, g: 128, b: 128 };
-      const meanLum = sumLum / count;
-      const variance = Math.max(0, sumLumSq / count - meanLum * meanLum);
-      return {
-        meanLum,
-        stdLum: Math.sqrt(variance),
-        r: sumR / count,
-        g: sumG / count,
-        b: sumB / count,
-      };
-    }
-
-    function checkFaceOcclusionAndQuality(videoEl, lm, isFrontal) {
-      try {
-        analysisCtx.drawImage(videoEl, 0, 0, analysisCanvas.width, analysisCanvas.height);
-        const imgData = analysisCtx.getImageData(0, 0, analysisCanvas.width, analysisCanvas.height);
-
-        const leftCheek = sampleRegionStats(imgData, lm[205].x, lm[205].y, 6);
-        const rightCheek = sampleRegionStats(imgData, lm[425].x, lm[425].y, 6);
-        const forehead = sampleRegionStats(imgData, lm[151].x, lm[151].y, 6);
-        const chin = sampleRegionStats(imgData, lm[152].x, lm[152].y, 5);
-        const leftEye = sampleRegionStats(imgData, (lm[33].x + lm[133].x) / 2, (lm[159].y + lm[145].y) / 2, 5);
-        const rightEye = sampleRegionStats(imgData, (lm[362].x + lm[263].x) / 2, (lm[386].y + lm[374].y) / 2, 5);
-
-        const avgFaceLum = (leftCheek.meanLum + rightCheek.meanLum + forehead.meanLum) / 3;
-
-        if (avgFaceLum < 42) {
-          return { ok: false, severity: 'warn', title: 'Слишком темно', sub: 'Встаньте лицом к свету' };
-        }
-        if (avgFaceLum > 242) {
-          return { ok: false, severity: 'warn', title: 'Слишком яркий свет', sub: 'Отойдите от прямого источника света' };
-        }
-
-        const cheekLumDiff = Math.abs(leftCheek.meanLum - rightCheek.meanLum);
-        const cheekColorDist = Math.hypot(
-          leftCheek.r - rightCheek.r,
-          leftCheek.g - rightCheek.g,
-          leftCheek.b - rightCheek.b
-        );
-        const eyeContrastRatio =
-          Math.max(leftEye.stdLum, rightEye.stdLum) / (Math.min(leftEye.stdLum, rightEye.stdLum) + 1);
-        const minEyeContrast = Math.min(leftEye.stdLum, rightEye.stdLum);
-
-        if (isFrontal) {
-          if (cheekLumDiff > 44 || cheekColorDist > 64) {
-            return {
-              ok: false,
-              severity: 'err',
-              title: 'Лицо частично закрыто',
-              sub: 'Уберите руку от лица',
-            };
-          }
-          if (minEyeContrast < 10.5 || eyeContrastRatio > 2.4) {
-            return {
-              ok: false,
-              severity: 'err',
-              title: 'Глаза не видны',
-              sub: 'Откройте глаза и не закрывайте лицо',
-            };
-          }
-        } else {
-          const maxEyeContrast = Math.max(leftEye.stdLum, rightEye.stdLum);
-          if (maxEyeContrast < 10 || cheekLumDiff > 74) {
-            return {
-              ok: false,
-              severity: 'err',
-              title: 'Лицо закрыто рукой',
-              sub: 'Не закрывайте лицо во время движения',
-            };
-          }
-        }
-
-        const chinForeheadColorDist = Math.hypot(
-          chin.r - forehead.r,
-          chin.g - forehead.g,
-          chin.b - forehead.b
-        );
-        if (chinForeheadColorDist > 88) {
-          return {
-            ok: false,
-            severity: 'err',
-            title: 'Нижняя часть лица закрыта',
-            sub: 'Уберите руку от подбородка и рта',
-          };
-        }
-
-        return { ok: true };
-      } catch {
-        return { ok: true };
-      }
-    }
-
-    function extractEulerDegrees(matrixData) {
-      const m = matrixData;
-      const yaw = Math.atan2(m[8], m[10]) * (180 / Math.PI);
-      const pitch = Math.asin(-Math.max(-1, Math.min(1, m[9]))) * (180 / Math.PI);
-      const roll = Math.atan2(m[1], m[5]) * (180 / Math.PI);
-      return { yaw, pitch, roll };
-    }
-
     function angularDiff(a, b) {
       let d = Math.abs(a - b) % 360;
       return d > 180 ? 360 - d : d;
     }
 
+    // Основной цикл проверки (плавный Sumsub-круг + защита от перекрытия по геометрии лица)
     function runFaceDetectionLoop(videoEl) {
       detectionLoopActive = true;
 
       let phase = 'calib';
       let calibHold = 0;
-      const CALIB_HOLD_REQUIRED = 16;
+      const CALIB_HOLD_REQUIRED = 14;
 
       let calibYaw = 0;
       let calibPitch = 0;
@@ -1066,7 +922,7 @@
           accessBanner.classList.add('hidden');
           pausedForAccess = false;
           onAfter();
-        }, 1250);
+        }, 1200);
       }
 
       updateStagePills();
@@ -1088,7 +944,7 @@
 
         if (faces.length === 0) {
           if (phase === 'calib') calibHold = 0;
-          if (phase === 'lr_right' || phase === 'lr_left') lrHold = 0;
+          if (phase === 'lr_right' || phase === 'lr_left') lrHold = Math.max(0, lrHold - 1);
           renderTicks(false);
           setCaption('warn', 'Поместите лицо в круг', 'Лицо не обнаружено');
           requestAnimationFrame(tick);
@@ -1113,7 +969,8 @@
         const faceWidth = Math.abs(leftEdge.x - rightEdge.x);
         const faceHeight = Math.abs(chin.y - forehead.y);
 
-        if (faceWidth < 0.26 || faceHeight < 0.24) {
+        // Проверка размера лица в кадре
+        if (faceWidth < 0.25 || faceHeight < 0.23) {
           if (phase === 'calib') calibHold = 0;
           renderTicks(false);
           setCaption('warn', 'Приблизьте лицо к камере', 'Лицо должно заполнять круг');
@@ -1121,32 +978,24 @@
           return;
         }
 
-        const quality = checkFaceOcclusionAndQuality(videoEl, lm, phase === 'calib');
-        if (!quality.ok) {
+        // Проверка, что лицо не ушло за края экрана
+        if (nose.x < 0.16 || nose.x > 0.84 || nose.y < 0.18 || nose.y > 0.82) {
           if (phase === 'calib') calibHold = 0;
-          if (phase === 'lr_right' || phase === 'lr_left') lrHold = 0;
-          renderTicks(quality.severity === 'err');
-          setCaption(quality.severity, quality.title, quality.sub);
+          renderTicks(false);
+          setCaption('warn', 'Держите лицо по центру круга', 'Не уводите голову за край экрана');
           requestAnimationFrame(tick);
           return;
         }
 
-        const matrix = result.facialTransformationMatrixes?.[0]?.data;
-        let rawYaw = 0;
-        let rawPitch = 0;
-        if (matrix) {
-          const euler = extractEulerDegrees(matrix);
-          rawYaw = euler.yaw;
-          rawPitch = euler.pitch;
-        } else {
-          const midX = (rightEdge.x + leftEdge.x) / 2;
-          const midY = (forehead.y + chin.y) / 2;
-          rawYaw = ((nose.x - midX) / faceWidth) * 90;
-          rawPitch = -((nose.y - midY) / faceHeight) * 90;
-        }
+        // Надёжный расчёт поворота (yaw) и наклона (pitch) по ключевым точкам лица
+        const midX = (rightEdge.x + leftEdge.x) / 2;
+        const midY = (forehead.y + chin.y) / 2;
 
-        const yaw = -(rawYaw - calibYaw);
-        const pitch = -(rawPitch - calibPitch);
+        const rawYaw = (nose.x - midX) / faceWidth;
+        const rawPitch = (nose.y - midY) / faceHeight;
+
+        const yaw = -(rawYaw - calibYaw) * 90;
+        const pitch = -(rawPitch - calibPitch) * 90;
 
         if (phase !== 'calib') {
           state.metrics.minYaw = Math.round(Math.min(state.metrics.minYaw, yaw));
@@ -1155,8 +1004,9 @@
           state.metrics.maxPitch = Math.round(Math.max(state.metrics.maxPitch, pitch));
         }
 
-        const vx = yaw / 14;
-        const vy = -pitch / 10;
+        // Комфортные пороги для кругового движения (вправо/влево ~11°, вверх/вниз ~7.5°)
+        const vx = yaw / 11;
+        const vy = -pitch / 7.5;
         const tiltMagnitude = Math.hypot(vx, vy);
         const screenAngleDeg = (((Math.atan2(vy, vx) * 180) / Math.PI) + 360) % 360;
 
@@ -1169,9 +1019,10 @@
           ].join('<br/>');
         }
 
+        // ЭТАП 1: Калибровка (смотрим прямо)
         if (phase === 'calib') {
           setArrow(null, '');
-          if (Math.abs(rawYaw) < 9 && Math.abs(rawPitch) < 11) {
+          if (Math.abs(rawYaw) < 0.09 && Math.abs(rawPitch) < 0.13) {
             calibHold++;
             calibSamples.push({ rawYaw, rawPitch });
             setCaption('', 'Смотрите прямо в круг', 'Не двигайтесь секунду...');
@@ -1194,14 +1045,16 @@
             phase = 'circle';
             updateStagePills();
           }
-        } else if (phase === 'circle') {
+        }
+        // ЭТАП 2: Круговое движение Вверх -> Влево -> Вниз -> Вправо
+        else if (phase === 'circle') {
           const targetSector = CIRCLE_SECTORS[currentSectorIdx];
           setArrow(targetSector.arrow, targetSector.symbol);
           setCaption('', 'Покрутите головой по кругу', targetSector.hint);
 
-          if (tiltMagnitude >= 0.85) {
+          if (tiltMagnitude >= 0.72) {
             for (let i = 0; i < TOTAL_TICKS; i++) {
-              if (angularDiff(tickElements[i].angleDeg, screenAngleDeg) <= 26) {
+              if (angularDiff(tickElements[i].angleDeg, screenAngleDeg) <= 38) {
                 completedTicks[i] = true;
               }
             }
@@ -1209,10 +1062,10 @@
 
           const sectorTicks = tickElements
             .map((t, idx) => ({ idx, diff: angularDiff(t.angleDeg, targetSector.centerDeg) }))
-            .filter((t) => t.diff <= 42);
+            .filter((t) => t.diff <= 45);
           const sectorLit = sectorTicks.filter((t) => completedTicks[t.idx]).length;
 
-          if (sectorLit >= Math.ceil(sectorTicks.length * 0.85)) {
+          if (sectorLit >= Math.ceil(sectorTicks.length * 0.7)) {
             if (currentSectorIdx < CIRCLE_SECTORS.length - 1) {
               currentSectorIdx++;
             } else {
@@ -1229,11 +1082,13 @@
           }
 
           renderTicks(false);
-        } else if (phase === 'lr_right') {
+        }
+        // ЭТАП 3А: Поворот вправо
+        else if (phase === 'lr_right') {
           setArrow('right', '→');
           setCaption('', 'Поверните голову ВПРАВО', 'Финальная проверка: 1 из 2');
 
-          if (yaw >= 14) {
+          if (yaw >= 13) {
             lrHold++;
           } else {
             lrHold = Math.max(0, lrHold - 1);
@@ -1244,11 +1099,13 @@
             phase = 'lr_left';
             lrHold = 0;
           }
-        } else if (phase === 'lr_left') {
+        }
+        // ЭТАП 3Б: Поворот влево
+        else if (phase === 'lr_left') {
           setArrow('left', '←');
           setCaption('', 'Поверните голову ВЛЕВО', 'Финальная проверка: 2 из 2');
 
-          if (yaw <= -14) {
+          if (yaw <= -13) {
             lrHold++;
           } else {
             lrHold = Math.max(0, lrHold - 1);
