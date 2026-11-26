@@ -19,7 +19,7 @@
       --danger: #dc2626;
       --danger-bg: #fee2e2;
       --border: #e5e7eb;
-      --radius: 16px;
+      --radius: 20px;
     }
 
     * {
@@ -42,7 +42,6 @@
       padding-top: 12px;
     }
 
-    /* Верхний прогресс-бар */
     .stepper {
       display: flex;
       gap: 6px;
@@ -57,20 +56,23 @@
       transition: background 0.3s ease;
     }
 
-    .step-bar.active {
-      background: var(--primary);
-    }
-
-    .step-bar.done {
-      background: var(--success);
-    }
+    .step-bar.active { background: var(--primary); }
+    .step-bar.done { background: var(--success); }
 
     .card {
       background: var(--card);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 22px 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
+    }
+
+    /* Чистый белый экран как в Sumsub на этапе биометрии */
+    .card.sumsub-mode {
+      border: none;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      padding: 24px 16px 28px;
+      text-align: center;
     }
 
     h1 {
@@ -85,9 +87,7 @@
       font-size: 14px;
     }
 
-    .field {
-      margin-bottom: 14px;
-    }
+    .field { margin-bottom: 14px; }
 
     label.field-label {
       display: block;
@@ -150,26 +150,11 @@
       transition: background 0.2s, opacity 0.2s;
     }
 
-    .btn:active {
-      background: var(--primary-dark);
-    }
+    .btn:active { background: var(--primary-dark); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    .btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
+    .hidden { display: none !important; }
 
-    .btn-secondary {
-      background: #eef2ff;
-      color: var(--primary);
-      margin-top: 10px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Уведомления */
     .alert {
       padding: 14px;
       border-radius: 12px;
@@ -189,11 +174,11 @@
       border: 1px solid #fde68a;
     }
 
-    /* Камера и проверка лица */
+    /* Верхние пилюли этапов */
     .camera-stage-pills {
       display: flex;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     .stage-pill {
@@ -207,24 +192,59 @@
       color: var(--muted);
     }
 
-    .stage-pill.active {
-      background: #dbeafe;
-      color: var(--primary-dark);
-    }
+    .stage-pill.active { background: #dbeafe; color: var(--primary-dark); }
+    .stage-pill.done { background: var(--success-bg); color: var(--success); }
 
-    .stage-pill.done {
-      background: var(--success-bg);
-      color: var(--success);
-    }
-
-    .video-wrapper {
+    /* Круговой виджет в стиле Sumsub */
+    .sumsub-circle-stage {
       position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 4px auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sumsub-ticks-svg {
+      position: absolute;
+      inset: 0;
       width: 100%;
-      aspect-ratio: 3 / 4;
-      background: #000;
-      border-radius: 20px;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .tick-line {
+      stroke: #cbd5e1;
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      transition: stroke 0.15s ease, stroke-width 0.15s ease;
+    }
+
+    .tick-line.target {
+      stroke: #60a5fa;
+      stroke-width: 3.8;
+    }
+
+    .tick-line.done {
+      stroke: #16a34a;
+      stroke-width: 4;
+    }
+
+    .tick-line.error {
+      stroke: #ef4444;
+    }
+
+    /* Круглое окно камеры с белым отступом до полосок */
+    .circle-video-mask {
+      position: relative;
+      width: 248px;
+      height: 248px;
+      border-radius: 50%;
       overflow: hidden;
-      margin-bottom: 12px;
+      background: #111827;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+      z-index: 2;
     }
 
     video#cameraVideo {
@@ -235,161 +255,98 @@
       display: block;
     }
 
-    .overlay-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    #ovalShape {
-      transition: stroke 0.25s ease, stroke-width 0.25s ease;
-    }
-
-    /* Анимированная стрелка направления */
+    /* Направляющая стрелка поверх круга */
     .direction-arrow {
       position: absolute;
-      width: 56px;
-      height: 56px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: rgba(37, 99, 235, 0.92);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
       z-index: 5;
+      pointer-events: none;
     }
 
-    .arrow-right {
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      animation: pulseRight 1s infinite;
-    }
+    .arrow-up { top: 44px; left: 50%; transform: translateX(-50%); animation: pulseUp 1s infinite; }
+    .arrow-left { left: 44px; top: 50%; transform: translateY(-50%); animation: pulseLeft 1s infinite; }
+    .arrow-down { bottom: 44px; left: 50%; transform: translateX(-50%); animation: pulseDown 1s infinite; }
+    .arrow-right { right: 44px; top: 50%; transform: translateY(-50%); animation: pulseRight 1s infinite; }
 
-    .arrow-left {
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      animation: pulseLeft 1s infinite;
-    }
+    @keyframes pulseUp { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -6px); } }
+    @keyframes pulseLeft { 0%, 100% { transform: translate(0, -50%); } 50% { transform: translate(-6px, -50%); } }
+    @keyframes pulseDown { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+    @keyframes pulseRight { 0%, 100% { transform: translate(0, -50%); } 50% { transform: translate(6px, -50%); } }
 
-    .arrow-down {
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: pulseDown 1s infinite;
-    }
-
-    .arrow-up {
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: pulseUp 1s infinite;
-    }
-
-    @keyframes pulseRight {
-      0%, 100% { transform: translate(0, -50%); }
-      50% { transform: translate(7px, -50%); }
-    }
-    @keyframes pulseLeft {
-      0%, 100% { transform: translate(0, -50%); }
-      50% { transform: translate(-7px, -50%); }
-    }
-    @keyframes pulseDown {
-      0%, 100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, 7px); }
-    }
-    @keyframes pulseUp {
-      0%, 100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, -7px); }
-    }
-
-    /* Плашка ACCESS */
+    /* Зелёная плашка ACCESS внутри круга */
     .access-banner {
       position: absolute;
       inset: 0;
-      background: rgba(22, 163, 74, 0.85);
+      border-radius: 50%;
+      background: rgba(22, 163, 74, 0.9);
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px;
+      padding: 16px;
       z-index: 10;
       animation: fadeIn 0.2s ease;
     }
 
     .access-badge {
-      font-size: 32px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: 2px;
-      border: 3px solid #fff;
-      padding: 6px 20px;
-      border-radius: 12px;
-      margin-bottom: 10px;
+      border: 2.5px solid #fff;
+      padding: 4px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.96); }
+      from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    .face-prompt-box {
-      background: #f8fafc;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      text-align: center;
+    /* Текст подсказки под кругом как в Sumsub */
+    .sumsub-caption-title {
+      font-size: 19px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+      transition: color 0.2s;
     }
 
-    .face-prompt-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
+    .sumsub-caption-title.err { color: var(--danger); }
+    .sumsub-caption-title.warn { color: var(--warning); }
 
-    .face-prompt-sub {
-      font-size: 13px;
+    .sumsub-caption-sub {
+      font-size: 14px;
       color: var(--muted);
+      min-height: 20px;
     }
 
-    .hold-progress {
-      width: 100%;
-      height: 6px;
-      background: #e5e7eb;
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .hold-progress-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--success);
-      transition: width 0.08s linear;
-    }
-
-    /* Debug панель */
     .debug-panel {
-      position: absolute;
+      position: fixed;
       top: 8px;
       left: 8px;
-      background: rgba(0, 0, 0, 0.72);
+      background: rgba(0, 0, 0, 0.8);
       color: #4ade80;
       font-family: monospace;
-      font-size: 11px;
+      font-size: 10.5px;
       padding: 6px 8px;
       border-radius: 8px;
-      z-index: 15;
+      z-index: 50;
       pointer-events: none;
       line-height: 1.35;
+      text-align: left;
     }
 
     /* Блоки фото договора */
@@ -410,17 +367,8 @@
       background: #f0fdf4;
     }
 
-    .doc-box-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .doc-box-desc {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
+    .doc-box-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .doc-box-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
 
     .doc-preview {
       width: 100%;
@@ -438,9 +386,7 @@
       color: #374151;
     }
 
-    .info-list li {
-      margin-bottom: 6px;
-    }
+    .info-list li { margin-bottom: 6px; }
 
     .success-icon {
       width: 64px;
@@ -466,7 +412,7 @@
       <div class="step-bar" id="bar4"></div>
     </div>
 
-    <!-- ЭКРАН БЛОКИРОВКИ: Встроенный браузер или HTTP -->
+    <!-- ЭКРАН БЛОКИРОВКИ -->
     <div class="card hidden" id="screenEnvBlock">
       <h1 id="envBlockTitle">Откройте сайт в Safari</h1>
       <p class="subtitle" id="envBlockText">
@@ -515,10 +461,10 @@
       <p class="subtitle">Сейчас мы включим фронтальную камеру вашего телефона.</p>
 
       <ul class="info-list">
-        <li>Встаньте так, чтобы лицо было хорошо освещено спереди.</li>
-        <li>Снимите головной убор, маску или тёмные очки.</li>
-        <li>Держите телефон на уровне глаз и следуйте подсказкам на экране.</li>
-        <li>Проверка происходит прямо в вашем браузере.</li>
+        <li>Расположите лицо по центру круга при хорошем освещении.</li>
+        <li>Не закрывайте лицо руками, волосами, маской или очками.</li>
+        <li>Плавно покрутите головой по кругу, закрашивая деления вокруг экрана.</li>
+        <li>Проверка работает прямо в вашем браузере.</li>
       </ul>
 
       <div id="cameraErrorBox" class="alert alert-danger hidden"></div>
@@ -526,49 +472,36 @@
       <button type="button" class="btn" id="startCameraBtn">Включить камеру</button>
     </div>
 
-    <!-- ШАГ 2Б: Живая проверка лица -->
-    <div class="card hidden" id="screenFaceCheck">
+    <!-- ШАГ 2Б: Живая проверка лица в стиле Sumsub -->
+    <div class="card sumsub-mode hidden" id="screenFaceCheck">
       <div class="camera-stage-pills">
-        <div class="stage-pill active" id="pillCalib">1. Прямо</div>
+        <div class="stage-pill active" id="pillCalib">1. Анфас</div>
         <div class="stage-pill" id="pillCircle">2. По кругу</div>
-        <div class="stage-pill" id="pillLR">3. Влево/Вправо</div>
+        <div class="stage-pill" id="pillLR">3. Влево / Вправо</div>
       </div>
 
-      <div class="video-wrapper">
-        <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
+      <div class="sumsub-circle-stage">
+        <!-- SVG со шкалой из 64 радиальных полосок -->
+        <svg class="sumsub-ticks-svg" id="ticksSvg" viewBox="0 0 320 320"></svg>
 
-        <!-- Овальная рамка -->
-        <svg class="overlay-svg" viewBox="0 0 300 400" preserveAspectRatio="none">
-          <defs>
-            <mask id="ovalMask">
-              <rect width="300" height="400" fill="white" />
-              <ellipse cx="150" cy="195" rx="92" ry="128" fill="black" />
-            </mask>
-          </defs>
-          <rect width="300" height="400" fill="rgba(17, 24, 39, 0.52)" mask="url(#ovalMask)" />
-          <ellipse id="ovalShape" cx="150" cy="195" rx="92" ry="128" fill="none" stroke="#ffffff" stroke-width="4" />
-        </svg>
+        <!-- Круглое видео -->
+        <div class="circle-video-mask">
+          <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
 
-        <!-- Анимированная стрелка -->
-        <div id="directionArrow" class="direction-arrow hidden">→</div>
-
-        <!-- Плашка ACCESS между этапами -->
-        <div id="accessBanner" class="access-banner hidden">
-          <div class="access-badge">ACCESS</div>
-          <div id="accessBannerText" style="font-size: 16px; font-weight: 600;">Этап пройден!</div>
+          <div id="accessBanner" class="access-banner hidden">
+            <div class="access-badge">ACCESS</div>
+            <div id="accessBannerText" style="font-size: 14px; font-weight: 600;">Этап пройден!</div>
+          </div>
         </div>
 
-        <!-- Debug панель (?debug=1) -->
-        <div id="debugPanel" class="debug-panel hidden"></div>
+        <!-- Анимированная стрелка направления -->
+        <div id="directionArrow" class="direction-arrow hidden">↑</div>
       </div>
 
-      <div class="face-prompt-box">
-        <div class="face-prompt-title" id="facePromptTitle">Загрузка нейросети...</div>
-        <div class="face-prompt-sub" id="facePromptSub">Пожалуйста, подождите пару секунд</div>
-        <div class="hold-progress">
-          <div class="hold-progress-fill" id="holdProgressFill"></div>
-        </div>
-      </div>
+      <div class="sumsub-caption-title" id="facePromptTitle">Загрузка камеры...</div>
+      <div class="sumsub-caption-sub" id="facePromptSub">Пожалуйста, подождите пару секунд</div>
+
+      <div id="debugPanel" class="debug-panel hidden"></div>
     </div>
 
     <!-- ШАГ 3: Фотографии договора аренды -->
@@ -576,7 +509,6 @@
       <h1>Фото договора аренды</h1>
       <p class="subtitle">Сфотографируйте две страницы договора при хорошем освещении, чтобы текст легко читался.</p>
 
-      <!-- Первая страница -->
       <div class="doc-box" id="docBox1" onclick="document.getElementById('docInput1').click()">
         <div class="doc-box-title">1. Первая страница договора</div>
         <div class="doc-box-desc" id="docDesc1">Нажмите, чтобы открыть камеру и сфотографировать</div>
@@ -584,7 +516,6 @@
         <input type="file" id="docInput1" accept="image/*" capture="environment" class="hidden" />
       </div>
 
-      <!-- Последняя страница -->
       <div class="doc-box" id="docBox2" onclick="document.getElementById('docInput2').click()">
         <div class="doc-box-title">2. Последняя страница с подписями</div>
         <div class="doc-box-desc" id="docDesc2">Нажмите, чтобы открыть камеру и сфотографировать</div>
@@ -616,7 +547,6 @@
 
     const isDebug = new URLSearchParams(window.location.search).get('debug') === '1';
 
-    // Состояние приложения
     const state = {
       fullName: '',
       email: '',
@@ -634,7 +564,45 @@
       },
     };
 
-    // 1. Проверка окружения (HTTPS и встроенные браузеры)
+    // Генерация 64 радиальных полосок вокруг круга (стиль Sumsub)
+    const TOTAL_TICKS = 64;
+    const tickElements = [];
+
+    function initRadialTicks() {
+      const svg = document.getElementById('ticksSvg');
+      svg.innerHTML = '';
+      tickElements.length = 0;
+
+      const cx = 160;
+      const cy = 160;
+      const rInner = 135; // белый зазор после круга видео (радиус видео 124px)
+      const rOuter = 152; // внешний край полосок
+
+      for (let i = 0; i < TOTAL_TICKS; i++) {
+        // 0-я полоска строго сверху (-90°), далее по часовой стрелке по экрану
+        const angleDeg = -90 + (i * 360) / TOTAL_TICKS;
+        const rad = (angleDeg * Math.PI) / 180;
+
+        const x1 = cx + rInner * Math.cos(rad);
+        const y1 = cy + rInner * Math.sin(rad);
+        const x2 = cx + rOuter * Math.cos(rad);
+        const y2 = cy + rOuter * Math.sin(rad);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1.toFixed(1));
+        line.setAttribute('y1', y1.toFixed(1));
+        line.setAttribute('x2', x2.toFixed(1));
+        line.setAttribute('y2', y2.toFixed(1));
+        line.setAttribute('class', 'tick-line');
+
+        svg.appendChild(line);
+        tickElements.push({ el: line, angleDeg: ((angleDeg % 360) + 360) % 360 });
+      }
+    }
+
+    initRadialTicks();
+
+    // Проверка окружения
     function checkEnvironment() {
       const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       if (location.protocol !== 'https:' && !isLocal) {
@@ -666,7 +634,6 @@
 
     checkEnvironment();
 
-    // Навигация между экранами
     function showScreen(screenId, stepNum) {
       ['screenStep1', 'screenCameraIntro', 'screenFaceCheck', 'screenContract', 'screenDone'].forEach((id) => {
         document.getElementById(id).classList.add('hidden');
@@ -681,7 +648,7 @@
       }
     }
 
-    // Предзагрузка модели MediaPipe
+    // Инициализация MediaPipe Face Landmarker
     let faceLandmarker = null;
     let modelLoadingPromise = null;
 
@@ -700,6 +667,10 @@
             },
             runningMode: 'VIDEO',
             numFaces: 2,
+            minFaceDetectionConfidence: 0.75,
+            minFacePresenceConfidence: 0.75,
+            minTrackingConfidence: 0.75,
+            outputFacialTransformationMatrixes: true,
           });
           return faceLandmarker;
         })();
@@ -707,7 +678,6 @@
       return modelLoadingPromise;
     }
 
-    // Шаг 1: Отправка формы анкеты
     document.getElementById('infoForm').addEventListener('submit', (e) => {
       e.preventDefault();
       state.fullName = document.getElementById('fullName').value.trim();
@@ -718,26 +688,11 @@
       showScreen('screenCameraIntro', 2);
     });
 
-    // Шаг 2: Работа с камерой, MediaRecorder и проверка лица
+    // Камера и запись видео
     let mediaStream = null;
     let mediaRecorder = null;
     let recordedChunks = [];
     let detectionLoopActive = false;
-
-    const REQUIRED_HOLD_FRAMES = 12;
-    const YAW_THRESHOLD = 13;   // градусов для вправо/влево
-    const PITCH_THRESHOLD = 9;  // градусов для вверх/вниз
-
-    // Последовательность шагов проверки лица
-    const LIVENESS_STEPS = [
-      { id: 'calib', stage: 1, title: 'Смотрите прямо в камеру', sub: 'Держите лицо ровно внутри овала', arrow: null },
-      { id: 'c_right', stage: 2, title: 'Круг: поверните голову ВПРАВО', sub: 'Шаг 1 из 4 по кругу', arrow: 'right', symbol: '→' },
-      { id: 'c_down', stage: 2, title: 'Круг: наклоните голову ВНИЗ', sub: 'Шаг 2 из 4 по кругу', arrow: 'down', symbol: '↓' },
-      { id: 'c_left', stage: 2, title: 'Круг: поверните голову ВЛЕВО', sub: 'Шаг 3 из 4 по кругу', arrow: 'left', symbol: '←' },
-      { id: 'c_up', stage: 2, title: 'Круг: поднимите голову ВВЕРХ', sub: 'Шаг 4 из 4 по кругу', arrow: 'up', symbol: '↑' },
-      { id: 'lr_right', stage: 3, title: 'Поверните голову ВПРАВО', sub: 'Финальная проверка: 1 из 2', arrow: 'right', symbol: '→' },
-      { id: 'lr_left', stage: 3, title: 'Поверните голову ВЛЕВО', sub: 'Финальная проверка: 2 из 2', arrow: 'left', symbol: '←' },
-    ];
 
     function showCameraError(err) {
       const box = document.getElementById('cameraErrorBox');
@@ -747,7 +702,7 @@
         box.innerHTML = `
           <strong>Доступ к камере запрещён.</strong><br/>
           Чтобы разрешить камеру на iPhone:<br/>
-          1. Нажмите <strong>«АА»</strong> или значок настроек слева/справа в адресной строке Safari.<br/>
+          1. Нажмите <strong>«АА»</strong> или значок настроек в адресной строке Safari.<br/>
           2. Выберите <strong>«Настройки веб-сайта» → «Камера» → «Разрешить»</strong>.<br/>
           3. Нажмите кнопку «Включить камеру» ниже ещё раз.
         `;
@@ -864,70 +819,268 @@
       }
     });
 
+    // Детектор перекрытия лица рукой (Anti-Occlusion)
+    const analysisCanvas = document.createElement('canvas');
+    analysisCanvas.width = 160;
+    analysisCanvas.height = 213;
+    const analysisCtx = analysisCanvas.getContext('2d', { willReadFrequently: true });
+
+    function sampleRegionStats(imgData, cxNorm, cyNorm, radiusPx) {
+      const w = imgData.width;
+      const h = imgData.height;
+      const data = imgData.data;
+      const cx = Math.round(cxNorm * w);
+      const cy = Math.round(cyNorm * h);
+
+      let sumLum = 0;
+      let sumLumSq = 0;
+      let sumR = 0;
+      let sumG = 0;
+      let sumB = 0;
+      let count = 0;
+
+      const x0 = Math.max(0, cx - radiusPx);
+      const x1 = Math.min(w - 1, cx + radiusPx);
+      const y0 = Math.max(0, cy - radiusPx);
+      const y1 = Math.min(h - 1, cy + radiusPx);
+
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const idx = (y * w + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          sumLum += lum;
+          sumLumSq += lum * lum;
+          sumR += r;
+          sumG += g;
+          sumB += b;
+          count++;
+        }
+      }
+
+      if (count === 0) return { meanLum: 128, stdLum: 20, r: 128, g: 128, b: 128 };
+      const meanLum = sumLum / count;
+      const variance = Math.max(0, sumLumSq / count - meanLum * meanLum);
+      return {
+        meanLum,
+        stdLum: Math.sqrt(variance),
+        r: sumR / count,
+        g: sumG / count,
+        b: sumB / count,
+      };
+    }
+
+    function checkFaceOcclusionAndQuality(videoEl, lm, isFrontal) {
+      try {
+        analysisCtx.drawImage(videoEl, 0, 0, analysisCanvas.width, analysisCanvas.height);
+        const imgData = analysisCtx.getImageData(0, 0, analysisCanvas.width, analysisCanvas.height);
+
+        const leftCheek = sampleRegionStats(imgData, lm[205].x, lm[205].y, 6);
+        const rightCheek = sampleRegionStats(imgData, lm[425].x, lm[425].y, 6);
+        const forehead = sampleRegionStats(imgData, lm[151].x, lm[151].y, 6);
+        const chin = sampleRegionStats(imgData, lm[152].x, lm[152].y, 5);
+        const leftEye = sampleRegionStats(imgData, (lm[33].x + lm[133].x) / 2, (lm[159].y + lm[145].y) / 2, 5);
+        const rightEye = sampleRegionStats(imgData, (lm[362].x + lm[263].x) / 2, (lm[386].y + lm[374].y) / 2, 5);
+
+        const avgFaceLum = (leftCheek.meanLum + rightCheek.meanLum + forehead.meanLum) / 3;
+
+        if (avgFaceLum < 42) {
+          return { ok: false, severity: 'warn', title: 'Слишком темно', sub: 'Встаньте лицом к свету' };
+        }
+        if (avgFaceLum > 242) {
+          return { ok: false, severity: 'warn', title: 'Слишком яркий свет', sub: 'Отойдите от прямого источника света' };
+        }
+
+        const cheekLumDiff = Math.abs(leftCheek.meanLum - rightCheek.meanLum);
+        const cheekColorDist = Math.hypot(
+          leftCheek.r - rightCheek.r,
+          leftCheek.g - rightCheek.g,
+          leftCheek.b - rightCheek.b
+        );
+        const eyeContrastRatio =
+          Math.max(leftEye.stdLum, rightEye.stdLum) / (Math.min(leftEye.stdLum, rightEye.stdLum) + 1);
+        const minEyeContrast = Math.min(leftEye.stdLum, rightEye.stdLum);
+
+        if (isFrontal) {
+          if (cheekLumDiff > 44 || cheekColorDist > 64) {
+            return {
+              ok: false,
+              severity: 'err',
+              title: 'Лицо частично закрыто',
+              sub: 'Уберите руку от лица',
+            };
+          }
+          if (minEyeContrast < 10.5 || eyeContrastRatio > 2.4) {
+            return {
+              ok: false,
+              severity: 'err',
+              title: 'Глаза не видны',
+              sub: 'Откройте глаза и не закрывайте лицо',
+            };
+          }
+        } else {
+          const maxEyeContrast = Math.max(leftEye.stdLum, rightEye.stdLum);
+          if (maxEyeContrast < 10 || cheekLumDiff > 74) {
+            return {
+              ok: false,
+              severity: 'err',
+              title: 'Лицо закрыто рукой',
+              sub: 'Не закрывайте лицо во время движения',
+            };
+          }
+        }
+
+        const chinForeheadColorDist = Math.hypot(
+          chin.r - forehead.r,
+          chin.g - forehead.g,
+          chin.b - forehead.b
+        );
+        if (chinForeheadColorDist > 88) {
+          return {
+            ok: false,
+            severity: 'err',
+            title: 'Нижняя часть лица закрыта',
+            sub: 'Уберите руку от подбородка и рта',
+          };
+        }
+
+        return { ok: true };
+      } catch {
+        return { ok: true };
+      }
+    }
+
+    function extractEulerDegrees(matrixData) {
+      const m = matrixData;
+      const yaw = Math.atan2(m[8], m[10]) * (180 / Math.PI);
+      const pitch = Math.asin(-Math.max(-1, Math.min(1, m[9]))) * (180 / Math.PI);
+      const roll = Math.atan2(m[1], m[5]) * (180 / Math.PI);
+      return { yaw, pitch, roll };
+    }
+
+    function angularDiff(a, b) {
+      let d = Math.abs(a - b) % 360;
+      return d > 180 ? 360 - d : d;
+    }
+
+    // Основной цикл проверки (Sumsub-логика с радиальными полосками)
     function runFaceDetectionLoop(videoEl) {
       detectionLoopActive = true;
-      let currentStepIdx = 0;
-      let holdFrames = 0;
-      let pausedForAccess = false;
+
+      // Фазы: 'calib' -> 'circle' -> 'lr_right' -> 'lr_left'
+      let phase = 'calib';
+      let calibHold = 0;
+      const CALIB_HOLD_REQUIRED = 16;
 
       let calibYaw = 0;
       let calibPitch = 0;
       let calibSamples = [];
 
-      const ovalShape = document.getElementById('ovalShape');
+      // Состояние 64 радиальных полосок для кругового движения
+      const completedTicks = new Array(TOTAL_TICKS).fill(false);
+
+      // Порядок секторов по кругу: Вверх (270°) -> Влево (180°) -> Вниз (90°) -> Вправо (0°)
+      const CIRCLE_SECTORS = [
+        { name: 'Вверх', centerDeg: 270, arrow: 'up', symbol: '↑', hint: 'Плавно поднимите голову ВВЕРХ' },
+        { name: 'Влево', centerDeg: 180, arrow: 'left', symbol: '←', hint: 'Теперь ведите голову ВЛЕВО' },
+        { name: 'Вниз', centerDeg: 90, arrow: 'down', symbol: '↓', hint: 'Теперь опустите голову ВНИЗ' },
+        { name: 'Вправо', centerDeg: 0, arrow: 'right', symbol: '→', hint: 'Завершите круг: поверните ВПРАВО' },
+      ];
+      let currentSectorIdx = 0;
+
+      // Финальный этап влево/вправо
+      let lrHold = 0;
+      const LR_HOLD_REQUIRED = 12;
+
+      let pausedForAccess = false;
+
       const arrowEl = document.getElementById('directionArrow');
       const promptTitle = document.getElementById('facePromptTitle');
       const promptSub = document.getElementById('facePromptSub');
-      const holdFill = document.getElementById('holdProgressFill');
       const debugPanel = document.getElementById('debugPanel');
       const accessBanner = document.getElementById('accessBanner');
       const accessBannerText = document.getElementById('accessBannerText');
 
       if (isDebug) debugPanel.classList.remove('hidden');
 
-      function updateStepUI() {
-        const step = LIVENESS_STEPS[currentStepIdx];
-        if (!step) return;
+      function setCaption(type, title, sub) {
+        promptTitle.className = 'sumsub-caption-title' + (type ? ` ${type}` : '');
+        promptTitle.textContent = title;
+        promptSub.textContent = sub;
+      }
 
-        promptTitle.textContent = step.title;
-        promptSub.textContent = step.sub;
-
-        // Обновляем пилюли этапов
+      function updateStagePills() {
         document.getElementById('pillCalib').className =
-          'stage-pill ' + (step.stage === 1 ? 'active' : 'done');
+          'stage-pill ' + (phase === 'calib' ? 'active' : 'done');
         document.getElementById('pillCircle').className =
-          'stage-pill ' + (step.stage === 2 ? 'active' : step.stage > 2 ? 'done' : '');
+          'stage-pill ' + (phase === 'circle' ? 'active' : (phase === 'lr_right' || phase === 'lr_left') ? 'done' : '');
         document.getElementById('pillLR').className =
-          'stage-pill ' + (step.stage === 3 ? 'active' : '');
+          'stage-pill ' + ((phase === 'lr_right' || phase === 'lr_left') ? 'active' : '');
+      }
 
-        // Обновляем анимированную стрелку
+      function renderTicks(errorMode = false) {
+        for (let i = 0; i < TOTAL_TICKS; i++) {
+          const item = tickElements[i];
+          if (errorMode) {
+            item.el.setAttribute('class', 'tick-line error');
+            continue;
+          }
+
+          if (phase === 'calib') {
+            const filledCount = Math.round((calibHold / CALIB_HOLD_REQUIRED) * TOTAL_TICKS);
+            item.el.setAttribute('class', i < filledCount ? 'tick-line done' : 'tick-line');
+          } else if (phase === 'circle') {
+            if (completedTicks[i]) {
+              item.el.setAttribute('class', 'tick-line done');
+            } else {
+              const targetSector = CIRCLE_SECTORS[currentSectorIdx];
+              const isTargetArc = targetSector && angularDiff(item.angleDeg, targetSector.centerDeg) <= 45;
+              item.el.setAttribute('class', isTargetArc ? 'tick-line target' : 'tick-line');
+            }
+          } else if (phase === 'lr_right' || phase === 'lr_left') {
+            const targetDeg = phase === 'lr_right' ? 0 : 180;
+            const isTargetArc = angularDiff(item.angleDeg, targetDeg) <= 45;
+            const progressRatio = lrHold / LR_HOLD_REQUIRED;
+            const isLit = isTargetArc && angularDiff(item.angleDeg, targetDeg) <= 45 * progressRatio;
+            if (isLit) {
+              item.el.setAttribute('class', 'tick-line done');
+            } else if (isTargetArc) {
+              item.el.setAttribute('class', 'tick-line target');
+            } else {
+              item.el.setAttribute('class', 'tick-line');
+            }
+          }
+        }
+      }
+
+      function setArrow(dir, symbol) {
         arrowEl.className = 'direction-arrow';
-        if (step.arrow) {
-          arrowEl.classList.add(`arrow-${step.arrow}`);
-          arrowEl.textContent = step.symbol;
+        if (dir) {
+          arrowEl.classList.add(`arrow-${dir}`);
+          arrowEl.textContent = symbol;
         } else {
           arrowEl.classList.add('hidden');
         }
       }
 
-      updateStepUI();
-
       function triggerAccessBanner(text, onAfter) {
         pausedForAccess = true;
-        ovalShape.setAttribute('stroke', '#16a34a');
-        ovalShape.setAttribute('stroke-width', '6');
-        arrowEl.classList.add('hidden');
+        setArrow(null, '');
+        tickElements.forEach((t) => t.el.setAttribute('class', 'tick-line done'));
         accessBannerText.textContent = text;
         accessBanner.classList.remove('hidden');
 
         setTimeout(() => {
           accessBanner.classList.add('hidden');
-          ovalShape.setAttribute('stroke', '#ffffff');
-          ovalShape.setAttribute('stroke-width', '4');
           pausedForAccess = false;
           onAfter();
-        }, 1400);
+        }, 1250);
       }
+
+      updateStagePills();
+      setCaption('', 'Смотрите прямо в круг', 'Держите лицо ровно по центру');
 
       let lastVideoTime = -1;
 
@@ -942,31 +1095,25 @@
         lastVideoTime = videoEl.currentTime;
         const result = faceLandmarker.detectForVideo(videoEl, performance.now());
         const faces = result.faceLandmarks || [];
-        const step = LIVENESS_STEPS[currentStepIdx];
 
-        // Проверка 1: ровно одно лицо в кадре
         if (faces.length === 0) {
-          holdFrames = 0;
-          holdFill.style.width = '0%';
-          ovalShape.setAttribute('stroke', '#f59e0b');
-          promptTitle.textContent = 'Лицо не найдено';
-          promptSub.textContent = 'Поместите лицо в центр овала';
+          if (phase === 'calib') calibHold = 0;
+          if (phase === 'lr_right' || phase === 'lr_left') lrHold = 0;
+          renderTicks(false);
+          setCaption('warn', 'Поместите лицо в круг', 'Лицо не обнаружено');
           requestAnimationFrame(tick);
           return;
         }
 
         if (faces.length > 1) {
-          holdFrames = 0;
-          holdFill.style.width = '0%';
-          ovalShape.setAttribute('stroke', '#dc2626');
-          promptTitle.textContent = 'В кадре несколько человек';
-          promptSub.textContent = 'В кадре должен быть только заявитель';
+          if (phase === 'calib') calibHold = 0;
+          renderTicks(true);
+          setCaption('err', 'В кадре несколько человек', 'Оставьте в кадре только одно лицо');
           requestAnimationFrame(tick);
           return;
         }
 
         const lm = faces[0];
-        // Ключевые точки MediaPipe: 1 (нос), 234 (правый край лица), 454 (левый край), 10 (верх лба), 152 (подбородок)
         const nose = lm[1];
         const rightEdge = lm[234];
         const leftEdge = lm[454];
@@ -976,237 +1123,4 @@
         const faceWidth = Math.abs(leftEdge.x - rightEdge.x);
         const faceHeight = Math.abs(chin.y - forehead.y);
 
-        // Проверка 2: лицо достаточно крупное
-        if (faceWidth < 0.26 || faceHeight < 0.24) {
-          holdFrames = 0;
-          holdFill.style.width = '0%';
-          ovalShape.setAttribute('stroke', '#f59e0b');
-          promptTitle.textContent = 'Поднесите телефон ближе';
-          promptSub.textContent = 'Лицо должно занимать большую часть овала';
-          requestAnimationFrame(tick);
-          return;
-        }
-
-        // Расчёт углов поворота (yaw) и наклона (pitch)
-        const midX = (rightEdge.x + leftEdge.x) / 2;
-        const midY = (forehead.y + chin.y) / 2;
-
-        const rawYaw = (nose.x - midX) / faceWidth;
-        const rawPitch = (nose.y - midY) / faceHeight;
-
-        const yaw = -(rawYaw - calibYaw) * 90;
-        const pitch = -(rawPitch - calibPitch) * 90;
-
-        // Сохраняем максимальные отклонения после калибровки
-        if (currentStepIdx > 0) {
-          state.metrics.minYaw = Math.round(Math.min(state.metrics.minYaw, yaw));
-          state.metrics.maxYaw = Math.round(Math.max(state.metrics.maxYaw, yaw));
-          state.metrics.minPitch = Math.round(Math.min(state.metrics.minPitch, pitch));
-          state.metrics.maxPitch = Math.round(Math.max(state.metrics.maxPitch, pitch));
-        }
-
-        if (isDebug) {
-          debugPanel.innerHTML = [
-            `step: ${step.id} (${holdFrames}/${REQUIRED_HOLD_FRAMES})`,
-            `yaw: ${yaw.toFixed(1)}° | pitch: ${pitch.toFixed(1)}°`,
-            `size: ${(faceWidth * 100).toFixed(0)}% x ${(faceHeight * 100).toFixed(0)}%`,
-          ].join('<br/>');
-        }
-
-        // Проверка условия текущего шага
-        let matched = false;
-        if (step.id === 'calib') {
-          matched = Math.abs(rawYaw) < 0.08 && Math.abs(rawPitch) < 0.12;
-          if (matched) {
-            calibSamples.push({ rawYaw, rawPitch });
-          } else {
-            calibSamples = [];
-          }
-        } else if (step.id === 'c_right' || step.id === 'lr_right') {
-          matched = yaw >= YAW_THRESHOLD;
-        } else if (step.id === 'c_left' || step.id === 'lr_left') {
-          matched = yaw <= -YAW_THRESHOLD;
-        } else if (step.id === 'c_down') {
-          matched = pitch <= -PITCH_THRESHOLD;
-        } else if (step.id === 'c_up') {
-          matched = pitch >= PITCH_THRESHOLD;
-        }
-
-        if (matched) {
-          holdFrames++;
-          ovalShape.setAttribute('stroke', '#16a34a');
-          promptTitle.textContent = step.title;
-          promptSub.textContent = 'Отлично, удерживайте...';
-        } else {
-          holdFrames = Math.max(0, holdFrames - 1);
-          ovalShape.setAttribute('stroke', '#3b82f6');
-          promptTitle.textContent = step.title;
-          promptSub.textContent = step.sub;
-        }
-
-        holdFill.style.width = `${Math.min(100, (holdFrames / REQUIRED_HOLD_FRAMES) * 100)}%`;
-
-        // Шаг засчитан!
-        if (holdFrames >= REQUIRED_HOLD_FRAMES) {
-          holdFrames = 0;
-          holdFill.style.width = '0%';
-
-          if (step.id === 'calib') {
-            // Усредняем калибровку и делаем фото анфас в высоком качестве
-            const sum = calibSamples.reduce(
-              (acc, s) => ({ y: acc.y + s.rawYaw, p: acc.p + s.rawPitch }),
-              { y: 0, p: 0 }
-            );
-            calibYaw = sum.y / calibSamples.length;
-            calibPitch = sum.p / calibSamples.length;
-            captureHighResSelfie(videoEl);
-
-            currentStepIdx++;
-            updateStepUI();
-          } else if (step.id === 'c_up') {
-            // Завершено круговое движение -> зелёный ACCESS -> переход к вправо/влево
-            triggerAccessBanner('Круговое движение пройдено!', () => {
-              currentStepIdx++;
-              updateStepUI();
-            });
-          } else if (step.id === 'lr_left') {
-            // Завершена финальная проверка вправо/влево -> ACCESS -> переход к договору
-            triggerAccessBanner('Проверка личности пройдена!', async () => {
-              await stopVideoRecordingAndCamera();
-              showScreen('screenContract', 3);
-            });
-            return;
-          } else {
-            currentStepIdx++;
-            updateStepUI();
-          }
-        }
-
-        requestAnimationFrame(tick);
-      }
-
-      requestAnimationFrame(tick);
-    }
-
-    // Шаг 3: Сжатие фото договора до ~1600 px
-    function compressImageFile(file, maxSide = 1600, quality = 0.85) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          let { width, height } = img;
-          if (width > maxSide || height > maxSide) {
-            if (width >= height) {
-              height = Math.round((height * maxSide) / width);
-              width = maxSide;
-            } else {
-              width = Math.round((width * maxSide) / height);
-              height = maxSide;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = () => {
-          URL.revokeObjectURL(url);
-          reject(new Error('Не удалось прочитать фотографию'));
-        };
-        img.src = url;
-      });
-    }
-
-    function updateSubmitButtonState() {
-      const ready = Boolean(state.contractPage1Base64 && state.contractLastPageBase64);
-      document.getElementById('submitAllBtn').disabled = !ready;
-    }
-
-    document.getElementById('docInput1').addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const compressed = await compressImageFile(file);
-      state.contractPage1Base64 = compressed;
-
-      document.getElementById('docBox1').classList.add('uploaded');
-      document.getElementById('docDesc1').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
-      const prev = document.getElementById('docPreview1');
-      prev.src = compressed;
-      prev.classList.remove('hidden');
-      updateSubmitButtonState();
-    });
-
-    document.getElementById('docInput2').addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const compressed = await compressImageFile(file);
-      state.contractLastPageBase64 = compressed;
-
-      document.getElementById('docBox2').classList.add('uploaded');
-      document.getElementById('docDesc2').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
-      const prev = document.getElementById('docPreview2');
-      prev.src = compressed;
-      prev.classList.remove('hidden');
-      updateSubmitButtonState();
-    });
-
-    // Шаг 4: Загрузка видео в Vercel Blob и отправка заявки
-    document.getElementById('submitAllBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('submitAllBtn');
-      const errBox = document.getElementById('submitErrorBox');
-      errBox.classList.add('hidden');
-      btn.disabled = true;
-
-      try {
-        let videoUrl = null;
-
-        if (state.videoBlob && state.videoBlob.size > 0) {
-          btn.textContent = 'Загружаем видео (0%)...';
-          const blob = await upload(`liveness-${Date.now()}.${state.videoExt}`, state.videoBlob, {
-            access: 'public',
-            handleUploadUrl: '/api/blob-token',
-            onUploadProgress: ({ percentage }) => {
-              btn.textContent = `Загружаем видео (${Math.round(percentage)}%)...`;
-            },
-          });
-          videoUrl = blob.url;
-        }
-
-        btn.textContent = 'Отправляем заявку...';
-
-        const response = await fetch('/api/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: state.fullName,
-            email: state.email,
-            apartment: state.apartment,
-            metrics: state.metrics,
-            selfieBase64: state.selfieBase64,
-            contractPage1Base64: state.contractPage1Base64,
-            contractLastPageBase64: state.contractLastPageBase64,
-            videoUrl,
-          }),
-        });
-
-        const result = await response.json();
-        if (!response.ok || !result.ok) {
-          throw new Error(result.error || 'Ошибка при отправке заявки');
-        }
-
-        document.getElementById('doneEmail').textContent = state.email;
-        showScreen('screenDone', 4);
-      } catch (err) {
-        console.error(err);
-        errBox.textContent = `Ошибка отправки: ${err.message}`;
-        errBox.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = 'Попробовать отправить снова';
-      }
-    });
-  </script>
-</body>
-</html>
+        if (faceWidth < 0.26 || faceHeight < 0.2
