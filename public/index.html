@@ -67,7 +67,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Чистый белый экран как в Sumsub на этапе биометрии */
     .card.sumsub-mode {
       border: none;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
@@ -174,7 +173,6 @@
       border: 1px solid #fde68a;
     }
 
-    /* Верхние пилюли этапов */
     .camera-stage-pills {
       display: flex;
       gap: 6px;
@@ -235,7 +233,6 @@
       stroke: #ef4444;
     }
 
-    /* Круглое окно камеры с белым отступом до полосок */
     .circle-video-mask {
       position: relative;
       width: 248px;
@@ -255,7 +252,6 @@
       display: block;
     }
 
-    /* Направляющая стрелка поверх круга */
     .direction-arrow {
       position: absolute;
       width: 44px;
@@ -283,7 +279,6 @@
     @keyframes pulseDown { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
     @keyframes pulseRight { 0%, 100% { transform: translate(0, -50%); } 50% { transform: translate(6px, -50%); } }
 
-    /* Зелёная плашка ACCESS внутри круга */
     .access-banner {
       position: absolute;
       inset: 0;
@@ -315,7 +310,6 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* Текст подсказки под кругом как в Sumsub */
     .sumsub-caption-title {
       font-size: 19px;
       font-weight: 600;
@@ -349,7 +343,6 @@
       text-align: left;
     }
 
-    /* Блоки фото договора */
     .doc-box {
       border: 2px dashed #cbd5e1;
       border-radius: 16px;
@@ -451,7 +444,7 @@
           <span>Я даю согласие на обработку фото лица, видеозаписи проверки и фотографий договора аренды для выдачи ключей от парковки.</span>
         </label>
 
-        <button type="submit" class="btn">Продолжить</button>
+        <button type="button" class="btn" id="continueBtn">Продолжить</button>
       </form>
     </div>
 
@@ -481,10 +474,8 @@
       </div>
 
       <div class="sumsub-circle-stage">
-        <!-- SVG со шкалой из 64 радиальных полосок -->
         <svg class="sumsub-ticks-svg" id="ticksSvg" viewBox="0 0 320 320"></svg>
 
-        <!-- Круглое видео -->
         <div class="circle-video-mask">
           <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
 
@@ -494,7 +485,6 @@
           </div>
         </div>
 
-        <!-- Анимированная стрелка направления -->
         <div id="directionArrow" class="direction-arrow hidden">↑</div>
       </div>
 
@@ -542,9 +532,6 @@
   </div>
 
   <script type="module">
-    import { FaceLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
-    import { upload } from 'https://esm.sh/@vercel/blob@0.27.0/client';
-
     const isDebug = new URLSearchParams(window.location.search).get('debug') === '1';
 
     const state = {
@@ -564,7 +551,7 @@
       },
     };
 
-    // Генерация 64 радиальных полосок вокруг круга (стиль Sumsub)
+    // 64 радиальные полоски вокруг круга (стиль Sumsub)
     const TOTAL_TICKS = 64;
     const tickElements = [];
 
@@ -575,11 +562,10 @@
 
       const cx = 160;
       const cy = 160;
-      const rInner = 135; // белый зазор после круга видео (радиус видео 124px)
-      const rOuter = 152; // внешний край полосок
+      const rInner = 135;
+      const rOuter = 152;
 
       for (let i = 0; i < TOTAL_TICKS; i++) {
-        // 0-я полоска строго сверху (-90°), далее по часовой стрелке по экрану
         const angleDeg = -90 + (i * 360) / TOTAL_TICKS;
         const rad = (angleDeg * Math.PI) / 180;
 
@@ -602,7 +588,6 @@
 
     initRadialTicks();
 
-    // Проверка окружения
     function checkEnvironment() {
       const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       if (location.protocol !== 'https:' && !isLocal) {
@@ -648,7 +633,7 @@
       }
     }
 
-    // Инициализация MediaPipe Face Landmarker
+    // Динамическая загрузка MediaPipe (не блокирует первый экран)
     let faceLandmarker = null;
     let modelLoadingPromise = null;
 
@@ -656,6 +641,9 @@
       if (faceLandmarker) return faceLandmarker;
       if (!modelLoadingPromise) {
         modelLoadingPromise = (async () => {
+          const { FaceLandmarker, FilesetResolver } = await import(
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs'
+          );
           const vision = await FilesetResolver.forVisionTasks(
             'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
           );
@@ -678,15 +666,22 @@
       return modelLoadingPromise;
     }
 
-    document.getElementById('infoForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Надёжный переход с Шага 1 без перезагрузки страницы
+    const infoForm = document.getElementById('infoForm');
+    function handleFormProceed(e) {
+      if (e) e.preventDefault();
+      if (!infoForm.reportValidity()) return;
+
       state.fullName = document.getElementById('fullName').value.trim();
       state.email = document.getElementById('email').value.trim();
       state.apartment = document.getElementById('apartment').value.trim();
 
       ensureFaceLandmarker().catch(console.error);
       showScreen('screenCameraIntro', 2);
-    });
+    }
+
+    infoForm.addEventListener('submit', handleFormProceed);
+    document.getElementById('continueBtn').addEventListener('click', handleFormProceed);
 
     // Камера и запись видео
     let mediaStream = null;
@@ -965,11 +960,9 @@
       return d > 180 ? 360 - d : d;
     }
 
-    // Основной цикл проверки (Sumsub-логика с радиальными полосками)
     function runFaceDetectionLoop(videoEl) {
       detectionLoopActive = true;
 
-      // Фазы: 'calib' -> 'circle' -> 'lr_right' -> 'lr_left'
       let phase = 'calib';
       let calibHold = 0;
       const CALIB_HOLD_REQUIRED = 16;
@@ -978,10 +971,9 @@
       let calibPitch = 0;
       let calibSamples = [];
 
-      // Состояние 64 радиальных полосок для кругового движения
       const completedTicks = new Array(TOTAL_TICKS).fill(false);
 
-      // Порядок секторов по кругу: Вверх (270°) -> Влево (180°) -> Вниз (90°) -> Вправо (0°)
+      // Порядок по часовой стрелке: Вверх (270°) -> Влево (180°) -> Вниз (90°) -> Вправо (0°)
       const CIRCLE_SECTORS = [
         { name: 'Вверх', centerDeg: 270, arrow: 'up', symbol: '↑', hint: 'Плавно поднимите голову ВВЕРХ' },
         { name: 'Влево', centerDeg: 180, arrow: 'left', symbol: '←', hint: 'Теперь ведите голову ВЛЕВО' },
@@ -990,10 +982,8 @@
       ];
       let currentSectorIdx = 0;
 
-      // Финальный этап влево/вправо
       let lrHold = 0;
       const LR_HOLD_REQUIRED = 12;
-
       let pausedForAccess = false;
 
       const arrowEl = document.getElementById('directionArrow');
@@ -1123,4 +1113,281 @@
         const faceWidth = Math.abs(leftEdge.x - rightEdge.x);
         const faceHeight = Math.abs(chin.y - forehead.y);
 
-        if (faceWidth < 0.26 || faceHeight < 0.2
+        if (faceWidth < 0.26 || faceHeight < 0.24) {
+          if (phase === 'calib') calibHold = 0;
+          renderTicks(false);
+          setCaption('warn', 'Приблизьте лицо к камере', 'Лицо должно заполнять круг');
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        const quality = checkFaceOcclusionAndQuality(videoEl, lm, phase === 'calib');
+        if (!quality.ok) {
+          if (phase === 'calib') calibHold = 0;
+          if (phase === 'lr_right' || phase === 'lr_left') lrHold = 0;
+          renderTicks(quality.severity === 'err');
+          setCaption(quality.severity, quality.title, quality.sub);
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        const matrix = result.facialTransformationMatrixes?.[0]?.data;
+        let rawYaw = 0;
+        let rawPitch = 0;
+        if (matrix) {
+          const euler = extractEulerDegrees(matrix);
+          rawYaw = euler.yaw;
+          rawPitch = euler.pitch;
+        } else {
+          const midX = (rightEdge.x + leftEdge.x) / 2;
+          const midY = (forehead.y + chin.y) / 2;
+          rawYaw = ((nose.x - midX) / faceWidth) * 90;
+          rawPitch = -((nose.y - midY) / faceHeight) * 90;
+        }
+
+        const yaw = -(rawYaw - calibYaw);
+        const pitch = -(rawPitch - calibPitch);
+
+        if (phase !== 'calib') {
+          state.metrics.minYaw = Math.round(Math.min(state.metrics.minYaw, yaw));
+          state.metrics.maxYaw = Math.round(Math.max(state.metrics.maxYaw, yaw));
+          state.metrics.minPitch = Math.round(Math.min(state.metrics.minPitch, pitch));
+          state.metrics.maxPitch = Math.round(Math.max(state.metrics.maxPitch, pitch));
+        }
+
+        const vx = yaw / 14;
+        const vy = -pitch / 10;
+        const tiltMagnitude = Math.hypot(vx, vy);
+        const screenAngleDeg = (((Math.atan2(vy, vx) * 180) / Math.PI) + 360) % 360;
+
+        if (isDebug) {
+          const litCount = completedTicks.filter(Boolean).length;
+          debugPanel.innerHTML = [
+            `phase: ${phase} | ticks: ${litCount}/${TOTAL_TICKS}`,
+            `yaw: ${yaw.toFixed(1)}° | pitch: ${pitch.toFixed(1)}°`,
+            `angle: ${screenAngleDeg.toFixed(0)}° | mag: ${tiltMagnitude.toFixed(2)}`,
+          ].join('<br/>');
+        }
+
+        if (phase === 'calib') {
+          setArrow(null, '');
+          if (Math.abs(rawYaw) < 9 && Math.abs(rawPitch) < 11) {
+            calibHold++;
+            calibSamples.push({ rawYaw, rawPitch });
+            setCaption('', 'Смотрите прямо в круг', 'Не двигайтесь секунду...');
+          } else {
+            calibHold = Math.max(0, calibHold - 1);
+            calibSamples = [];
+            setCaption('', 'Смотрите прямо в круг', 'Выровняйте голову по центру');
+          }
+          renderTicks(false);
+
+          if (calibHold >= CALIB_HOLD_REQUIRED) {
+            const sum = calibSamples.reduce(
+              (acc, s) => ({ y: acc.y + s.rawYaw, p: acc.p + s.rawPitch }),
+              { y: 0, p: 0 }
+            );
+            calibYaw = sum.y / calibSamples.length;
+            calibPitch = sum.p / calibSamples.length;
+            captureHighResSelfie(videoEl);
+
+            phase = 'circle';
+            updateStagePills();
+          }
+        } else if (phase === 'circle') {
+          const targetSector = CIRCLE_SECTORS[currentSectorIdx];
+          setArrow(targetSector.arrow, targetSector.symbol);
+          setCaption('', 'Покрутите головой по кругу', targetSector.hint);
+
+          if (tiltMagnitude >= 0.85) {
+            for (let i = 0; i < TOTAL_TICKS; i++) {
+              if (angularDiff(tickElements[i].angleDeg, screenAngleDeg) <= 26) {
+                completedTicks[i] = true;
+              }
+            }
+          }
+
+          const sectorTicks = tickElements
+            .map((t, idx) => ({ idx, diff: angularDiff(t.angleDeg, targetSector.centerDeg) }))
+            .filter((t) => t.diff <= 42);
+          const sectorLit = sectorTicks.filter((t) => completedTicks[t.idx]).length;
+
+          if (sectorLit >= Math.ceil(sectorTicks.length * 0.85)) {
+            if (currentSectorIdx < CIRCLE_SECTORS.length - 1) {
+              currentSectorIdx++;
+            } else {
+              completedTicks.fill(true);
+              renderTicks(false);
+              triggerAccessBanner('Круговое движение пройдено!', () => {
+                phase = 'lr_right';
+                lrHold = 0;
+                updateStagePills();
+              });
+              requestAnimationFrame(tick);
+              return;
+            }
+          }
+
+          renderTicks(false);
+        } else if (phase === 'lr_right') {
+          setArrow('right', '→');
+          setCaption('', 'Поверните голову ВПРАВО', 'Финальная проверка: 1 из 2');
+
+          if (yaw >= 14) {
+            lrHold++;
+          } else {
+            lrHold = Math.max(0, lrHold - 1);
+          }
+          renderTicks(false);
+
+          if (lrHold >= LR_HOLD_REQUIRED) {
+            phase = 'lr_left';
+            lrHold = 0;
+          }
+        } else if (phase === 'lr_left') {
+          setArrow('left', '←');
+          setCaption('', 'Поверните голову ВЛЕВО', 'Финальная проверка: 2 из 2');
+
+          if (yaw <= -14) {
+            lrHold++;
+          } else {
+            lrHold = Math.max(0, lrHold - 1);
+          }
+          renderTicks(false);
+
+          if (lrHold >= LR_HOLD_REQUIRED) {
+            triggerAccessBanner('Личность подтверждена!', async () => {
+              await stopVideoRecordingAndCamera();
+              showScreen('screenContract', 3);
+            });
+            return;
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function compressImageFile(file, maxSide = 1600, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let { width, height } = img;
+          if (width > maxSide || height > maxSide) {
+            if (width >= height) {
+              height = Math.round((height * maxSide) / width);
+              width = maxSide;
+            } else {
+              width = Math.round((width * maxSide) / height);
+              height = maxSide;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('Не удалось прочитать фотографию'));
+        };
+        img.src = url;
+      });
+    }
+
+    function updateSubmitButtonState() {
+      const ready = Boolean(state.contractPage1Base64 && state.contractLastPageBase64);
+      document.getElementById('submitAllBtn').disabled = !ready;
+    }
+
+    document.getElementById('docInput1').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const compressed = await compressImageFile(file);
+      state.contractPage1Base64 = compressed;
+
+      document.getElementById('docBox1').classList.add('uploaded');
+      document.getElementById('docDesc1').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
+      const prev = document.getElementById('docPreview1');
+      prev.src = compressed;
+      prev.classList.remove('hidden');
+      updateSubmitButtonState();
+    });
+
+    document.getElementById('docInput2').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const compressed = await compressImageFile(file);
+      state.contractLastPageBase64 = compressed;
+
+      document.getElementById('docBox2').classList.add('uploaded');
+      document.getElementById('docDesc2').textContent = '✓ Фото загружено (нажмите, чтобы переснять)';
+      const prev = document.getElementById('docPreview2');
+      prev.src = compressed;
+      prev.classList.remove('hidden');
+      updateSubmitButtonState();
+    });
+
+    document.getElementById('submitAllBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitAllBtn');
+      const errBox = document.getElementById('submitErrorBox');
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+
+      try {
+        let videoUrl = null;
+
+        if (state.videoBlob && state.videoBlob.size > 0) {
+          btn.textContent = 'Загружаем видео (0%)...';
+          const { upload } = await import('https://esm.sh/@vercel/blob@0.27.0/client');
+          const blob = await upload(`liveness-${Date.now()}.${state.videoExt}`, state.videoBlob, {
+            access: 'public',
+            handleUploadUrl: '/api/blob-token',
+            onUploadProgress: ({ percentage }) => {
+              btn.textContent = `Загружаем видео (${Math.round(percentage)}%)...`;
+            },
+          });
+          videoUrl = blob.url;
+        }
+
+        btn.textContent = 'Отправляем заявку...';
+
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: state.fullName,
+            email: state.email,
+            apartment: state.apartment,
+            metrics: state.metrics,
+            selfieBase64: state.selfieBase64,
+            contractPage1Base64: state.contractPage1Base64,
+            contractLastPageBase64: state.contractLastPageBase64,
+            videoUrl,
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || 'Ошибка при отправке заявки');
+        }
+
+        document.getElementById('doneEmail').textContent = state.email;
+        showScreen('screenDone', 4);
+      } catch (err) {
+        console.error(err);
+        errBox.textContent = `Ошибка отправки: ${err.message}`;
+        errBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Попробовать отправить снова';
+      }
+    });
+  </script>
+</body>
+</html>
